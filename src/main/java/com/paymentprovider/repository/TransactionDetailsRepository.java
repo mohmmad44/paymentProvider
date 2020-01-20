@@ -8,20 +8,14 @@ import com.paymentprovider.model.TransactionDetails;
 @Repository
 public interface TransactionDetailsRepository extends JpaRepository<TransactionDetails, Integer> {
 
-	
-	
 	TransactionDetails findById(String clientId, String orderId);
 
-	
+	void updateRegiStatus(String clientId, String orderId);
 
-	void saveAuthTransactionStatus(String orderId);
+	void updateAuthStatus(String clientId, String orderId);
 
+	void reverseTransaction(String clientId, String orderId);
 
-
-	void saveCapTransactionStatus(String orderId);
-
-
-
-	TransactionDetails findById(String orderId);
+	TransactionDetails findByStatus(String status);
 
 }

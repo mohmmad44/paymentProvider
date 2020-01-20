@@ -1,84 +1,55 @@
 package com.paymentprovider.serviceImpl;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import com.paymentprovider.dto.AuthoriseDTO;
-import com.paymentprovider.dto.RegisterDto;
-import com.paymentprovider.model.Currency;
-import com.paymentprovider.model.PaymentMethod;
 import com.paymentprovider.model.TransactionDetails;
-import com.paymentprovider.repository.CurrencyRepository;
-import com.paymentprovider.repository.PaymentMethodRepository;
 import com.paymentprovider.repository.TransactionDetailsRepository;
 import com.paymentprovider.service.PaymentProviderService;
 
+@Service
 public class PaymentProviderImpl implements PaymentProviderService {
 
-	
-	
 	@Autowired
 	TransactionDetailsRepository transDetalRepo;
 
-	
 	@Override
-	public void saveRegister(RegisterDto registerDto) {
-		TransactionDetails transactionDetails = new TransactionDetails();
-		transactionDetails.setClientId(registerDto.getClientId());
-		transactionDetails.setAmount(registerDto.getAmount());
-		transactionDetails.setCurrency(currencyRepo.getCurrencyId(registerDto.getCurrencyId()));
-		transactionDetails.setPaymentMethod(payMethRepo.getPaymentId(registerDto.getPaymentMethodId()));
-		transactionDetails.setStatus("Registered");
-		transDetalRepo.save(transactionDetails);
-		
+	public TransactionDetails findTransaction(String clientId, String orderId) {
+		return transDetalRepo.findById(clientId, orderId);
 	}
 
 	@Override
-	public TransactionDetails getRegisterById(String clientId, String orderId) {
-		TransactionDetails registerById= transDetalRepo.findById(clientId,orderId);
-		if(registerById.getStatus()=="Registered") {
-		return registerById;
-		}else if(registerById.getStatus()=="Authorised") {
-			return "";
-		}
+	public void registerTransaction(String clientId, String orderId, Integer amount, String currency,
+			String paymentMethod) {
+		TransactionDetails tDetails = new TransactionDetails();
+		tDetails.setClientId(clientId);
+		tDetails.setOrderId(orderId);
+		tDetails.setAmount(amount);
+		tDetails.setCurrency(currency);
+		tDetails.setPaymentMethod(paymentMethod);
+
+		transDetalRepo.save(tDetails);
 	}
 
 	@Override
-	public void updateAuthorise(AuthoriseDTO authoriseDTO) {
-		String orderId=authoriseDTO.getOrderId();
-		transDetalRepo.saveAuthTransactionStatus(orderId);
-		
+	public void authoriseTransaction(String clientId, String orderId) {
+		transDetalRepo.updateRegiStatus(clientId, orderId);
 	}
 
 	@Override
-	public TransactionDetails getCaptureById(String clientId, String orderId) {
-		TransactionDetails registerById= transDetalRepo.findById(clientId,orderId);
-		if(registerById.getStatus()=="Authorised") {
-		return registerById;
-		}else if(registerById.getStatus()=="Registered") {
-			return "";
-		}
+	public void captureTransaction(String clientId, String orderId) {
+		transDetalRepo.updateAuthStatus(clientId, orderId);
 	}
 
 	@Override
-	public void updateCapture(AuthoriseDTO authoriseDTO) {
-		String orderId=authoriseDTO.getOrderId();
-		transDetalRepo.saveCapTransactionStatus(orderId);
-		
+	public void reverseTransaction(String clientId, String orderId) {
+		transDetalRepo.reverseTransaction(clientId, orderId);
 	}
 
 	@Override
-	public TransactionDetails getRegisterById(String orderId) {
-		return transDetalRepo.findById(orderId);;
+	public TransactionDetails findPendingTransactions(String status) {
+		TransactionDetails pendingtransDetails = transDetalRepo.findByStatus(status);
+		return pendingtransDetails;
 	}
-	
-	
-	
-	
-	
-	
-
-	
 
 }

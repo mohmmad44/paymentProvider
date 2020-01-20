@@ -1,24 +1,19 @@
 package com.paymentprovider.service;
 
-import com.paymentprovider.dto.AuthoriseDTO;
-import com.paymentprovider.dto.RegisterDto;
 import com.paymentprovider.model.TransactionDetails;
 
 public interface PaymentProviderService {
 
+	TransactionDetails findTransaction(String clientId, String orderId);
 
+	void registerTransaction(String clientId, String orderId, Integer amount, String currency, String paymentMethod);
 
-	void saveRegister(RegisterDto registerDto);
+	void authoriseTransaction(String clientId, String orderId);
 
-	TransactionDetails getRegisterById(String clientId, String orderId);
+	void captureTransaction(String clientId, String orderId);
 
-	void updateAuthorise(AuthoriseDTO authoriseDTO);
+	void reverseTransaction(String clientId, String orderId);
 
-	TransactionDetails getCaptureById(String clientId, String orderId);
-
-	void updateCapture(AuthoriseDTO authoriseDTO);
-
-	TransactionDetails getRegisterById(String orderId);
-
+	TransactionDetails findPendingTransactions(String status);
 
 }
