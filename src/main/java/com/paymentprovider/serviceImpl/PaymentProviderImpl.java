@@ -1,5 +1,7 @@
 package com.paymentprovider.serviceImpl;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +17,19 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Override
 	public TransactionDetails findTransaction(String clientId, String orderId) {
-		return transDetalRepo.findById(clientId, orderId);
+		return transDetalRepo.findTransaction(clientId, orderId);
 	}
 
 	@Override
-	public void registerTransaction(String clientId, String orderId, Integer amount, String currency,
-			String paymentMethod) {
+	public void registerTransaction(String clientId, String orderId, Integer amount, String currency, String paymentMethod, String payTokenId) {
 		TransactionDetails tDetails = new TransactionDetails();
 		tDetails.setClientId(clientId);
 		tDetails.setOrderId(orderId);
 		tDetails.setAmount(amount);
 		tDetails.setCurrency(currency);
 		tDetails.setPaymentMethod(paymentMethod);
+		tDetails.setPayTokenId(payTokenId);
+		tDetails.setStatus("REGISTERED");
 
 		transDetalRepo.save(tDetails);
 	}
@@ -47,9 +50,15 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	}
 
 	@Override
-	public TransactionDetails findPendingTransactions(String status) {
-		TransactionDetails pendingtransDetails = transDetalRepo.findByStatus(status);
+	public TransactionDetails findPendingTransactions(String clientId) {
+		TransactionDetails pendingtransDetails = transDetalRepo.findPendingTransations(clientId);
 		return pendingtransDetails;
+	}
+	
+	@Override
+	public Integer findTotalofSuccTransaction(String clientId, Date begindate, Date enddate) {
+		Integer total= transDetalRepo.findTotalAmont(clientId, begindate, enddate);
+		return total;
 	}
 
 }

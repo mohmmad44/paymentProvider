@@ -8,31 +8,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 public class TransactionDetails {
-
-	@Id
-	@Column(name = "id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
 
 	@Column(name = "client_id")
 	private String clientId;
 
-	@Column(name = "order_id")
+	@Id
+	@Column(name = "order_id", unique = true)
+	// @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
+	// "pay_tokenId")
+	// @SequenceGenerator(name="pay_tokenId", sequenceName = "book-",
+	// allocationSize=50)
 	private String orderId;
-	
-	
-	@Column(name= "order_date")
+
+	@Column(name = "order_date")
 	private Date date;
 
 	@Column(name = "amount")
 	private Integer amount;
-
-	@Column(name = "pay_token_id", unique = true)
-	private String payTokenId;
-
-	
 
 	@Column(name = "currency")
 	private String currency;
@@ -43,16 +38,11 @@ public class TransactionDetails {
 	@Column(name = "transaction_type")
 	private String transactionType;
 
+	@Column(name = "pay_token_id", unique = true)
+	private String payTokenId;
+
 	@Column(name = "status")
 	private String status;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public String getPayTokenId() {
 		return payTokenId;
@@ -126,5 +116,4 @@ public class TransactionDetails {
 		this.payTokenId = payTokenId;
 	}
 
-	
 }
