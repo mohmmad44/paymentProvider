@@ -12,6 +12,16 @@ public interface TransactionDetailsRepository extends JpaRepository<TransactionD
 	
 	TransactionDetails findById(String clientId, String orderId);
 
-	void saveTransactionStatus(String orderId);
+	
+
+	void saveAuthTransactionStatus(String orderId);
+
+
+
+	void saveCapTransactionStatus(String orderId);
+
+
+
+	TransactionDetails findById(String orderId);
 
 }

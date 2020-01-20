@@ -88,10 +88,19 @@ public class PaymentproviderController {
 		return "view/showcapture";
 	}
 
-	@PostMapping("/updateauthorise")
+	@PostMapping("/updatecapture")
 	public String updateCapture(@ModelAttribute AuthoriseDTO authoriseDTO) {
-		paymentService.updateAuthorise(authoriseDTO);
+		paymentService.updateCapture(authoriseDTO);
 		return "redirect:/home";
 	}
+	
+	@GetMapping("/findbyorderid")
+	public String findByOrderId(@RequestParam("orderId") String orderId,Model model) {
+
+		TransactionDetails register = paymentService.getRegisterById(orderId);
+		model.addAttribute("register", register);
+		return "view/showauthorise";
+	}
+	
 
 }

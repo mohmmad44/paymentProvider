@@ -16,26 +16,12 @@ import com.paymentprovider.service.PaymentProviderService;
 
 public class PaymentProviderImpl implements PaymentProviderService {
 
-	@Autowired
-	CurrencyRepository currencyRepo;
 	
-	@Autowired
-	PaymentMethodRepository payMethRepo;
 	
 	@Autowired
 	TransactionDetailsRepository transDetalRepo;
 
-	@Override
-	public List<Currency> getCurrency() {
-
-		return currencyRepo.findAll();
-	}
-
-	@Override
-	public List<PaymentMethod> getPaymentMethod() {
-		return payMethRepo.findAll();
-	}
-
+	
 	@Override
 	public void saveRegister(RegisterDto registerDto) {
 		TransactionDetails transactionDetails = new TransactionDetails();
@@ -61,9 +47,36 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	@Override
 	public void updateAuthorise(AuthoriseDTO authoriseDTO) {
 		String orderId=authoriseDTO.getOrderId();
-		transDetalRepo.saveTransactionStatus(orderId);
+		transDetalRepo.saveAuthTransactionStatus(orderId);
 		
 	}
+
+	@Override
+	public TransactionDetails getCaptureById(String clientId, String orderId) {
+		TransactionDetails registerById= transDetalRepo.findById(clientId,orderId);
+		if(registerById.getStatus()=="Authorised") {
+		return registerById;
+		}else if(registerById.getStatus()=="Registered") {
+			return "";
+		}
+	}
+
+	@Override
+	public void updateCapture(AuthoriseDTO authoriseDTO) {
+		String orderId=authoriseDTO.getOrderId();
+		transDetalRepo.saveCapTransactionStatus(orderId);
+		
+	}
+
+	@Override
+	public TransactionDetails getRegisterById(String orderId) {
+		return transDetalRepo.findById(orderId);;
+	}
+	
+	
+	
+	
+	
 	
 
 	

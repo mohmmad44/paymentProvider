@@ -32,17 +32,16 @@ public class TransactionDetails {
 	@Column(name = "pay_token_id", unique = true)
 	private String payTokenId;
 
-	@ManyToOne
-	@JoinColumn(name = "payment_method_id")
-	private PaymentMethod paymentMethod;
+	
 
-	@ManyToOne
-	@JoinColumn(name = "curreny_id")
-	private Currency currency;
+	@Column(name = "currency")
+	private String currency;
 
-	@ManyToOne
-	@JoinColumn(name = "transaction_type_id")
-	private TransactionType transationType;
+	@Column(name = "payment_method")
+	private String paymentMethod;
+
+	@Column(name = "transaction_type")
+	private String transactionType;
 
 	@Column(name = "status")
 	private String status;
@@ -57,34 +56,6 @@ public class TransactionDetails {
 
 	public String getPayTokenId() {
 		return payTokenId;
-	}
-
-	public void setPayTokenId(String payTokenId) {
-		this.payTokenId = payTokenId;
-	}
-
-	public PaymentMethod getPaymentMethod() {
-		return paymentMethod;
-	}
-
-	public void setPaymentMethod(PaymentMethod paymentMethod) {
-		this.paymentMethod = paymentMethod;
-	}
-
-	public Currency getCurrency() {
-		return currency;
-	}
-
-	public void setCurrency(Currency currency) {
-		this.currency = currency;
-	}
-
-	public TransactionType getTransationType() {
-		return transationType;
-	}
-
-	public void setTransationType(TransactionType transationType) {
-		this.transationType = transationType;
 	}
 
 	public String getClientId() {
@@ -103,12 +74,44 @@ public class TransactionDetails {
 		this.orderId = orderId;
 	}
 
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
 	public Integer getAmount() {
 		return amount;
 	}
 
 	public void setAmount(Integer amount) {
 		this.amount = amount;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	public String getTransactionType() {
+		return transactionType;
+	}
+
+	public void setTransactionType(String transactionType) {
+		this.transactionType = transactionType;
 	}
 
 	public String getStatus() {
@@ -119,4 +122,9 @@ public class TransactionDetails {
 		this.status = status;
 	}
 
+	public void setPayTokenId(String payTokenId) {
+		this.payTokenId = payTokenId;
+	}
+
+	
 }
