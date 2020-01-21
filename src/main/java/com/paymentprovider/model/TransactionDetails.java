@@ -12,6 +12,9 @@ import javax.persistence.SequenceGenerator;
 
 public class TransactionDetails {
 
+	
+	
+
 	@Column(name = "client_id")
 	private String clientId;
 
@@ -44,6 +47,15 @@ public class TransactionDetails {
 	@Column(name = "status")
 	private String status;
 
+	
+
+	public TransactionDetails() {
+		super();
+	}
+	
+	
+	
+	
 	public String getPayTokenId() {
 		return payTokenId;
 	}

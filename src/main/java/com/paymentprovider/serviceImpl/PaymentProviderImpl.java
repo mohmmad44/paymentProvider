@@ -17,14 +17,17 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	TransactionDetailsRepository transDetalRepo;
 
 	CommandLinePojo comdLinePojo = new CommandLinePojo();
-
-	TransactionDetails transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(),
+	TransactionDetails transDetails= new TransactionDetails();
+	
+	public TransactionDetails findByorder() {
+	return transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(),
 			comdLinePojo.getOrderId());
+	}
 
 	boolean comparePojo = new Gson().toJson(comdLinePojo).equals(new Gson().toJson(transDetails));
 
 	@Override
-	public String registerNewTransaction(CommandLinePojo comdLinePojo) {
+	public String registerNewTransaction(CommandLinePojo comdLinePojo) throws Exception {
 		String tranStatus = transDetails.getStatus();
 
 		if (transDetails == null || (tranStatus != "REVERSED" && (comparePojo != true))) {
@@ -34,7 +37,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			return "order is successfully REGISTERED";
 
 		} else
-			return "orderId is already exist";
+			return "orderId already exist";
 	}
 
 	@Override

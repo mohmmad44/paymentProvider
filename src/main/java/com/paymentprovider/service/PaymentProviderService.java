@@ -9,7 +9,7 @@ public interface PaymentProviderService {
 
 	
 
-	String registerNewTransaction(CommandLinePojo comdLinePojo);
+	String registerNewTransaction(CommandLinePojo comdLinePojo) throws Exception;
 
 	String authoriseTransaction(CommandLinePojo comdLinePojo);
 
