@@ -7,19 +7,19 @@ import com.paymentprovider.model.TransactionDetails;
 
 public interface PaymentProviderService {
 
-	TransactionDetails findTransaction(String clientId, String orderId);
+	
 
-	void registerTransaction(CommandLinePojo comdLinePojo);
+	String registerNewTransaction(CommandLinePojo comdLinePojo);
 
-	void authoriseTransaction(String clientId, String orderId);
+	String authoriseTransaction(CommandLinePojo comdLinePojo);
 
-	void captureTransaction(String clientId, String orderId);
+	String captureTransaction(CommandLinePojo comdLinePojo);
 
-	void reverseTransaction(String clientId, String orderId);
+	String reverseTransaction(CommandLinePojo comdLinePojo);
 
-	TransactionDetails findPendingTransactions(String status);
+	TransactionDetails findPendingTransactions();
 
-	Integer findTotalofSuccTransaction(String clientId, Date begindate, Date enddate);
+	Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo);
 
 	
 

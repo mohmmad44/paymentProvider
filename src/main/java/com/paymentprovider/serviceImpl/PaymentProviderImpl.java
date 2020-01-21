@@ -1,15 +1,10 @@
 package com.paymentprovider.serviceImpl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
-import com.paymentprovider.controller.Controller;
 import com.paymentprovider.model.CommandLinePojo;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.repository.TransactionDetailsRepository;
@@ -27,17 +22,12 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			comdLinePojo.getOrderId());
 
 	boolean comparePojo = new Gson().toJson(comdLinePojo).equals(new Gson().toJson(transDetails));
-	
-	
-	
-	
-	
-	
-	
 
+	@Override
 	public String registerNewTransaction(CommandLinePojo comdLinePojo) {
+		String tranStatus = transDetails.getStatus();
 
-		if (transDetails == null) {
+		if (transDetails == null || (tranStatus != "REVERSED" && (comparePojo != true))) {
 			BeanUtils.copyProperties(transDetails, comdLinePojo);
 			transDetails.setStatus("REGISTERED");
 			transDetalRepo.save(transDetails);
@@ -47,6 +37,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			return "orderId is already exist";
 	}
 
+	@Override
 	public String authoriseTransaction(CommandLinePojo comdLinePojo) {
 		String tranStatus = transDetails.getStatus();
 
@@ -67,6 +58,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	}
 
+	@Override
 	public String captureTransaction(CommandLinePojo comdLinePojo) {
 		String tranStatus = transDetails.getStatus();
 
@@ -87,6 +79,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	}
 
+	@Override
 	public String reverseTransaction(CommandLinePojo comdLinePojo) {
 		String tranStatus = transDetails.getStatus();
 
@@ -98,22 +91,23 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 		} else if (tranStatus == "REVERSED") {
 			return "transaction is  already Cancelled  ";
-		}else
+		} else
 
 			transDetalRepo.reverseTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 		return "order is successfully REVERSED";
 
 	}
 
-	
+	@Override
 	public TransactionDetails findPendingTransactions() {
 		TransactionDetails pendingtransDetails = transDetalRepo.findPendingTransations(comdLinePojo.getClientId());
 		return pendingtransDetails;
 	}
 
 	@Override
-	public Integer findTotalofSuccTransaction(String clientId, Date begindate, Date enddate) {
-		Integer total = transDetalRepo.findTotalAmont(clientId, begindate, enddate);
+	public Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo) {
+		Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), comdLinePojo.getStrDate(),
+				comdLinePojo.getEndDate());
 		return total;
 	}
 

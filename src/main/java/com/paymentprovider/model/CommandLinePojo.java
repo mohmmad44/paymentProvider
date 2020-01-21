@@ -1,5 +1,7 @@
 package com.paymentprovider.model;
 
+import java.util.Date;
+
 public class CommandLinePojo {
 
 	private String clientId;
@@ -9,8 +11,23 @@ public class CommandLinePojo {
 	private String currency;
 	private String paymentMethod;
 	private String payTokenId;
+	private Date strDate;
+	private Date endDate;
 	
 	
+	
+	public Date getStrDate() {
+		return strDate;
+	}
+	public void setStrDate(Date strDate) {
+		this.strDate = strDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 	
 	public String getClientId() {
 		return clientId;
