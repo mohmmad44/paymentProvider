@@ -3,13 +3,11 @@ package com.paymentprovider.model;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-
+import javax.persistence.Table;
+@Entity
+@Table(name="transaction_details")
 public class TransactionDetails {
 
 	
@@ -35,8 +33,8 @@ public class TransactionDetails {
 	@Column(name = "currency")
 	private String currency;
 
-	@Column(name = "payment_method")
-	private String paymentMethod;
+	@Column(name = "pay_method")
+	private String payMethod;
 
 	@Column(name = "transaction_type")
 	private String transactionType;
@@ -52,80 +50,115 @@ public class TransactionDetails {
 	public TransactionDetails() {
 		super();
 	}
-	
-	
-	
-	
-	public String getPayTokenId() {
-		return payTokenId;
-	}
+
+
 
 	public String getClientId() {
 		return clientId;
 	}
 
+
+
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
 	}
+
+
 
 	public String getOrderId() {
 		return orderId;
 	}
 
+
+
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
+
+
 
 	public Date getDate() {
 		return date;
 	}
 
+
+
 	public void setDate(Date date) {
 		this.date = date;
 	}
+
+
 
 	public Integer getAmount() {
 		return amount;
 	}
 
+
+
 	public void setAmount(Integer amount) {
 		this.amount = amount;
 	}
+
+
 
 	public String getCurrency() {
 		return currency;
 	}
 
+
+
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
 
-	public String getPaymentMethod() {
-		return paymentMethod;
+
+
+	public String getPayMethod() {
+		return payMethod;
 	}
 
-	public void setPaymentMethod(String paymentMethod) {
-		this.paymentMethod = paymentMethod;
+
+
+	public void setPayMethod(String payMethod) {
+		this.payMethod = payMethod;
 	}
+
+
 
 	public String getTransactionType() {
 		return transactionType;
 	}
 
+
+
 	public void setTransactionType(String transactionType) {
 		this.transactionType = transactionType;
 	}
 
-	public String getStatus() {
-		return status;
+
+
+	public String getPayTokenId() {
+		return payTokenId;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+
 
 	public void setPayTokenId(String payTokenId) {
 		this.payTokenId = payTokenId;
 	}
 
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
+	
 }

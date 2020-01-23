@@ -3,6 +3,7 @@ package com.paymentprovider.serviceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.paymentprovider.model.CommandLinePojo;
@@ -11,6 +12,7 @@ import com.paymentprovider.repository.TransactionDetailsRepository;
 import com.paymentprovider.service.PaymentProviderService;
 
 @Service
+@Transactional
 public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Autowired
@@ -109,9 +111,8 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Override
 	public Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo) {
-		Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), comdLinePojo.getStrDate(),
-				comdLinePojo.getEndDate());
-		return total;
+		//Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), comdLinePojo.getStrDate(),comdLinePojo.getEndDate());
+		return 0;
 	}
 
 }

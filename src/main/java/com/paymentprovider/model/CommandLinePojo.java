@@ -9,25 +9,11 @@ public class CommandLinePojo {
 	private Integer amount;
 	private String transactionType;
 	private String currency;
-	private String paymentMethod;
+	private String payMethod;
 	private String payTokenId;
 	private Date strDate;
 	private Date endDate;
 	
-	
-	
-	public Date getStrDate() {
-		return strDate;
-	}
-	public void setStrDate(Date strDate) {
-		this.strDate = strDate;
-	}
-	public Date getEndDate() {
-		return endDate;
-	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
 	
 	public String getClientId() {
 		return clientId;
@@ -59,11 +45,11 @@ public class CommandLinePojo {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-	public String getPaymentMethod() {
-		return paymentMethod;
+	public String getPayMethod() {
+		return payMethod;
 	}
-	public void setPaymentMethod(String paymentMethod) {
-		this.paymentMethod = paymentMethod;
+	public void setPayMethod(String payMethod) {
+		this.payMethod = payMethod;
 	}
 	public String getPayTokenId() {
 		return payTokenId;
@@ -71,9 +57,19 @@ public class CommandLinePojo {
 	public void setPayTokenId(String payTokenId) {
 		this.payTokenId = payTokenId;
 	}
-
+	public Date getStrDate() {
+		return strDate;
+	}
+	public void setStrDate(Date strDate) {
+		this.strDate = strDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 	
-	
-	
+		
 	
 }

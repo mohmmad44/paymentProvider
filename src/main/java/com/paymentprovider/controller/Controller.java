@@ -16,7 +16,7 @@ public class Controller {
 	CommandLinePojo comdLinePojo =new CommandLinePojo();
 	
 	
-	public void callSwitchMethod( String input) {
+	public void callSwitchMethod( String input) throws Exception {
 		
 		switch (input) {
 		case "register":
