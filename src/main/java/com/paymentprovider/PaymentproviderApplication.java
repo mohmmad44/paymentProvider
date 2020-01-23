@@ -10,6 +10,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.paymentprovider.model.CommandLinePojo;
 
 @SpringBootApplication
@@ -23,33 +25,27 @@ public class PaymentproviderApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		
+
 		System.out.println(args);
-		String method = args.getNonOptionArgs().get(0);
+		String method = args.getNonOptionArgs().get(0).toString();
 		Class<CommandLinePojo> aClass = CommandLinePojo.class;
 		Field[] fields = aClass.getDeclaredFields();
-		
-		
-		StringBuffer buffer = new StringBuffer();
-		
+
+		JsonObject json = new JsonObject();
+
 		for (Field field : fields) {
 			field.setAccessible(true);
-			String value = args.getOptionValues(field.getName()) != null?args.getOptionValues(field.getName()).get(0):null;
-			buffer.append("'"+field.getName()+"'"+":"+value+",");
+			String value = args.getOptionValues(field.getName()) != null ? args.getOptionValues(field.getName()).get(0): null;
+			json.addProperty(field.getName(), value);
 		}
 		
-		String json = buffer.toString();
-		
-		int lastCommaIndex = json.lastIndexOf(",");
-		json = "{"+json.substring(0, lastCommaIndex)+"}";
-		
-		System.out.println(json);
+		Gson gson = new Gson();
+		String payload = gson.toJson(json);
+		System.out.println(payload);
 		ObjectMapper mapper = new ObjectMapper();
-		CommandLinePojo readValue = mapper.readValue(json, CommandLinePojo.class);
+		CommandLinePojo readValue = mapper.readValue(payload, CommandLinePojo.class);
 		System.out.println(readValue.getClientId());
-	}
-	
-	
-	
-}
 
+	}
+
+}
