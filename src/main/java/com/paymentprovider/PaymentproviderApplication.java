@@ -2,8 +2,7 @@ package com.paymentprovider;
 
 import java.lang.reflect.Field;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,11 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.paymentprovider.model.CommandLinePojo;
+import com.paymentprovider.model.TransactionDetails;
+import com.paymentprovider.service.PaymentProviderService;
 
 @SpringBootApplication
 public class PaymentproviderApplication implements ApplicationRunner {
 
-	private static final Logger logger = LoggerFactory.getLogger(PaymentproviderApplication.class);
+	@Autowired
+	PaymentProviderService ppService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PaymentproviderApplication.class, args);
@@ -35,17 +37,54 @@ public class PaymentproviderApplication implements ApplicationRunner {
 
 		for (Field field : fields) {
 			field.setAccessible(true);
-			String value = args.getOptionValues(field.getName()) != null ? args.getOptionValues(field.getName()).get(0): null;
+			String value = args.getOptionValues(field.getName()) != null ? args.getOptionValues(field.getName()).get(0)
+					: null;
 			json.addProperty(field.getName(), value);
 		}
-		
+
 		Gson gson = new Gson();
 		String payload = gson.toJson(json);
 		System.out.println(payload);
 		ObjectMapper mapper = new ObjectMapper();
-		CommandLinePojo readValue = mapper.readValue(payload, CommandLinePojo.class);
-		System.out.println(readValue.getClientId());
+		CommandLinePojo comdLinePojo = mapper.readValue(payload, CommandLinePojo.class);
 
+		
+		
+		switch (method) {
+		case "register":
+			String newTrans = ppService.registerNewTransaction(comdLinePojo);
+			System.out.println(newTrans);
+			break;
+
+		case "authorise":
+			String authorise = ppService.authoriseTransaction(comdLinePojo);
+			System.out.println(authorise);
+			break;
+
+		case "capture":
+			String capture = ppService.captureTransaction(comdLinePojo);
+			System.out.println(capture);
+			break;
+
+		case "reverse":
+			String reverse = ppService.reverseTransaction(comdLinePojo);
+			System.out.println(reverse);
+			break;
+
+		case "findByOrder":
+
+			break;
+		case "findPending":
+			TransactionDetails pendingTrans = ppService.findPendingTransactions();
+			System.out.println(pendingTrans);
+			break;
+
+		case "findTotal":
+			Integer findTotal = ppService.findTotalofSuccTransaction(comdLinePojo);
+			System.out.println(findTotal);
+			break;
+
+		}
 	}
 
 }
