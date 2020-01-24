@@ -1,7 +1,5 @@
 package com.paymentprovider.service;
 
-import java.util.Date;
-
 import com.paymentprovider.model.CommandLinePojo;
 import com.paymentprovider.model.TransactionDetails;
 
@@ -20,6 +18,8 @@ public interface PaymentProviderService {
 	TransactionDetails findPendingTransactions();
 
 	Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo);
+
+	TransactionDetails findByorder() throws Exception;
 
 	
 

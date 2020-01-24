@@ -28,7 +28,6 @@ public class PaymentproviderApplication implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 
-		System.out.println(args);
 		String method = args.getNonOptionArgs().get(0).toString();
 		Class<CommandLinePojo> aClass = CommandLinePojo.class;
 		Field[] fields = aClass.getDeclaredFields();
@@ -49,7 +48,21 @@ public class PaymentproviderApplication implements ApplicationRunner {
 		CommandLinePojo comdLinePojo = mapper.readValue(payload, CommandLinePojo.class);
 
 		
-		
+/*
+		if (comdLinePojo.getCurrency().equals("EUR") || comdLinePojo.getCurrency().equals("USD")
+				|| comdLinePojo.getCurrency().equals("GBP")) {
+
+		} else
+			return "currency not supported";
+
+		if (comdLinePojo.getCurrency().equals("EUR") || comdLinePojo.getCurrency().equals("USD")
+				|| comdLinePojo.getCurrency().equals("GBP")) {
+
+		} else
+			return "currency not supported";
+			
+*/			
+
 		switch (method) {
 		case "register":
 			String newTrans = ppService.registerNewTransaction(comdLinePojo);
@@ -72,7 +85,8 @@ public class PaymentproviderApplication implements ApplicationRunner {
 			break;
 
 		case "findByOrder":
-
+			TransactionDetails findByOrder = ppService.findByorder();
+			System.out.println(findByOrder);
 			break;
 		case "findPending":
 			TransactionDetails pendingTrans = ppService.findPendingTransactions();
@@ -86,5 +100,4 @@ public class PaymentproviderApplication implements ApplicationRunner {
 
 		}
 	}
-
 }

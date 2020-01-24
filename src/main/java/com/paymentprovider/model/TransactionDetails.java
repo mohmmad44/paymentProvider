@@ -1,6 +1,6 @@
 package com.paymentprovider.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,7 +25,7 @@ public class TransactionDetails {
 	private String orderId;
 
 	@Column(name = "order_date")
-	private Date date;
+	private LocalDate date;
 
 	@Column(name = "amount")
 	private Integer amount;
@@ -45,120 +45,80 @@ public class TransactionDetails {
 	@Column(name = "status")
 	private String status;
 
-	
-
-	public TransactionDetails() {
-		super();
-	}
-
-
-
 	public String getClientId() {
 		return clientId;
 	}
-
-
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
 	}
 
-
-
 	public String getOrderId() {
 		return orderId;
 	}
-
-
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
 
-
-
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-
-
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
-
-
 
 	public Integer getAmount() {
 		return amount;
 	}
 
-
-
 	public void setAmount(Integer amount) {
 		this.amount = amount;
 	}
-
-
 
 	public String getCurrency() {
 		return currency;
 	}
 
-
-
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-
-
 
 	public String getPayMethod() {
 		return payMethod;
 	}
 
-
-
 	public void setPayMethod(String payMethod) {
 		this.payMethod = payMethod;
 	}
-
-
 
 	public String getTransactionType() {
 		return transactionType;
 	}
 
-
-
 	public void setTransactionType(String transactionType) {
 		this.transactionType = transactionType;
 	}
-
-
 
 	public String getPayTokenId() {
 		return payTokenId;
 	}
 
-
-
 	public void setPayTokenId(String payTokenId) {
 		this.payTokenId = payTokenId;
 	}
-
-
 
 	public String getStatus() {
 		return status;
 	}
 
-
-
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
 	
+
 	
 	
 }

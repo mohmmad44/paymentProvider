@@ -19,31 +19,37 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	TransactionDetailsRepository transDetalRepo;
 
 	CommandLinePojo comdLinePojo = new CommandLinePojo();
-	TransactionDetails transDetails= new TransactionDetails();
-	
-	public TransactionDetails findByorder() {
-	return transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(),
-			comdLinePojo.getOrderId());
+	TransactionDetails transDetails = new TransactionDetails();
+
+	@Override
+	public TransactionDetails findByorder() throws Exception {
+
+		return transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
+
 	}
 
 	boolean comparePojo = new Gson().toJson(comdLinePojo).equals(new Gson().toJson(transDetails));
 
 	@Override
 	public String registerNewTransaction(CommandLinePojo comdLinePojo) throws Exception {
-		String tranStatus = transDetails.getStatus();
 
-		if (transDetails == null || (tranStatus != "REVERSED" && (comparePojo != true))) {
-			BeanUtils.copyProperties(transDetails, comdLinePojo);
-			transDetails.setStatus("REGISTERED");
-			transDetalRepo.save(transDetails);
-			return "order is successfully REGISTERED";
+		transDetails.setAmount(comdLinePojo.getAmount());
+		transDetails.setClientId(comdLinePojo.getClientId());
+		transDetails.setCurrency(comdLinePojo.getCurrency());
+		transDetails.setDate(java.time.LocalDate.now());
+		transDetails.setOrderId(comdLinePojo.getOrderId());
+		transDetails.setPayMethod(comdLinePojo.getPayMethod());
+		transDetails.setPayTokenId(comdLinePojo.getPayTokenId());
+		transDetails.setTransactionType(comdLinePojo.getTransactionType());
+		transDetails.setStatus("REGISTERED");
+		transDetalRepo.save(transDetails);
+		return "order is successfully REGISTERED";
 
-		} else
-			return "orderId already exist";
 	}
 
 	@Override
 	public String authoriseTransaction(CommandLinePojo comdLinePojo) {
+		TransactionDetails transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 		String tranStatus = transDetails.getStatus();
 
 		if (transDetails == null) {
@@ -55,7 +61,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 		} else if (tranStatus != "REGISTERED") {
 			return "transaction is not in REGISTERED state ";
 		} else if (tranStatus == "REVERSED") {
-			return "transaction is not in REVERSED state ";
+			return "transaction is in REVERSED state ";
 		} else
 
 			transDetalRepo.updateRegiStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
@@ -111,7 +117,8 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Override
 	public Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo) {
-		//Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), comdLinePojo.getStrDate(),comdLinePojo.getEndDate());
+		// Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(),
+		// comdLinePojo.getStrDate(),comdLinePojo.getEndDate());
 		return 0;
 	}
 

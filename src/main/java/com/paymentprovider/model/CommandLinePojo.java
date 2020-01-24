@@ -15,6 +15,26 @@ public class CommandLinePojo {
 	private Date endDate;
 	
 	
+	
+	public CommandLinePojo(String clientId, String orderId, Integer amount, String transactionType, String currency,
+			String payMethod, String payTokenId, Date strDate, Date endDate) {
+		super();
+		this.clientId = clientId;
+		this.orderId = orderId;
+		this.amount = amount;
+		this.transactionType = transactionType;
+		this.currency = currency;
+		this.payMethod = payMethod;
+		this.payTokenId = payTokenId;
+		this.strDate = strDate;
+		this.endDate = endDate;
+	}
+	
+	
+	public CommandLinePojo() {
+	}
+
+
 	public String getClientId() {
 		return clientId;
 	}
