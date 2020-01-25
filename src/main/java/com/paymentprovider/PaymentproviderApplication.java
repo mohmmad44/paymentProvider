@@ -1,7 +1,10 @@
 package com.paymentprovider;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,6 +21,8 @@ import com.paymentprovider.service.PaymentProviderService;
 @SpringBootApplication
 public class PaymentproviderApplication implements ApplicationRunner {
 
+ private final Logger logger = LoggerFactory.getLogger(PaymentproviderApplication.class);
+ 
 	@Autowired
 	PaymentProviderService ppService;
 
@@ -43,7 +48,7 @@ public class PaymentproviderApplication implements ApplicationRunner {
 
 		Gson gson = new Gson();
 		String payload = gson.toJson(json);
-		System.out.println(payload);
+		//System.out.println(payload);
 		ObjectMapper mapper = new ObjectMapper();
 		CommandLinePojo comdLinePojo = mapper.readValue(payload, CommandLinePojo.class);
 
@@ -85,12 +90,13 @@ public class PaymentproviderApplication implements ApplicationRunner {
 			break;
 
 		case "findByOrder":
-			TransactionDetails findByOrder = ppService.findByorder();
+			TransactionDetails findByOrder = ppService.findByorder(comdLinePojo);
 			System.out.println(findByOrder);
 			break;
 		case "findPending":
-			TransactionDetails pendingTrans = ppService.findPendingTransactions();
-			System.out.println(pendingTrans);
+			List<TransactionDetails> pendingTrans = ppService.findPendingTransactions(comdLinePojo);
+			String pendingload = gson.toJson(pendingTrans);
+			System.out.println(pendingload);
 			break;
 
 		case "findTotal":

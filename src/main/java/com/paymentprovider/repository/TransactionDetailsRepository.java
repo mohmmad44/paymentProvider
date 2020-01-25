@@ -1,6 +1,10 @@
 package com.paymentprovider.repository;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -12,19 +16,24 @@ public interface TransactionDetailsRepository extends JpaRepository<TransactionD
 	@Query("select a from TransactionDetails as a where a.clientId = ?1 and a.orderId = ?2")
 	TransactionDetails findTransaction(String clientId, String orderId);
 
-	@Query("update TransactionDetails as a SET a.status='AUTHORISED' where a.clientId = ?1 and a.orderId = ?2")
-	void updateRegiStatus(String clientId, String orderId);
-
-	@Query("update TransactionDetails as a SET a.status='CAPTURED' where a.clientId = ?1 and a.orderId = ?2")
+	@Modifying
+	@Query("update TransactionDetails as a set a.status='AUTHORISED' where a.clientId = ?1 and a.orderId = ?2")
+	int updateRegiStatus(String clientId, String orderId);
+	
+	@Modifying
+	@Query("update TransactionDetails as a set a.status='CAPTURED' where a.clientId = ?1 and a.orderId = ?2")
 	void updateAuthStatus(String clientId, String orderId);
 	
-	@Query("update TransactionDetails as a SET a.status='REVERSED' where a.clientId = ?1 and a.orderId = ?2")
+	@Modifying
+	@Query("update TransactionDetails as a set a.status='REVERSED' where a.clientId = ?1 and a.orderId = ?2")
 	void reverseTransaction(String clientId, String orderId);
 
 	@Query("select a from TransactionDetails as a where a.clientId = ?1 and (a.status='REGISTERED' or a.status='AUTHORISED')")
-	TransactionDetails findPendingTransations(String clientId);
+	List<TransactionDetails> findPendingTransations(String clientId);
+
+	@Query("select sum(a.amount) from TransactionDetails as a where a.clientId = ?1 and (a.date between ?2 and ?3)  and a.status='CAPTURED'")
+	Integer findTotalAmont(String clientId, LocalDate strDate, LocalDate endDate);
 	
 	
-	//Integer findTotalAmont(String clientId, Date begindate, Date enddate);
 
 }

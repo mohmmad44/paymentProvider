@@ -1,11 +1,11 @@
 package com.paymentprovider.serviceImpl;
 
-import org.springframework.beans.BeanUtils;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.gson.Gson;
 import com.paymentprovider.model.CommandLinePojo;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.repository.TransactionDetailsRepository;
@@ -13,6 +13,7 @@ import com.paymentprovider.service.PaymentProviderService;
 
 @Service
 @Transactional
+
 public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Autowired
@@ -22,104 +23,126 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	TransactionDetails transDetails = new TransactionDetails();
 
 	@Override
-	public TransactionDetails findByorder() throws Exception {
+	public TransactionDetails findByorder(CommandLinePojo comdLinePojo) throws Exception {
 
 		return transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 
 	}
 
-	boolean comparePojo = new Gson().toJson(comdLinePojo).equals(new Gson().toJson(transDetails));
 
 	@Override
 	public String registerNewTransaction(CommandLinePojo comdLinePojo) throws Exception {
 
-		transDetails.setAmount(comdLinePojo.getAmount());
-		transDetails.setClientId(comdLinePojo.getClientId());
-		transDetails.setCurrency(comdLinePojo.getCurrency());
-		transDetails.setDate(java.time.LocalDate.now());
-		transDetails.setOrderId(comdLinePojo.getOrderId());
-		transDetails.setPayMethod(comdLinePojo.getPayMethod());
-		transDetails.setPayTokenId(comdLinePojo.getPayTokenId());
-		transDetails.setTransactionType(comdLinePojo.getTransactionType());
-		transDetails.setStatus("REGISTERED");
-		transDetalRepo.save(transDetails);
-		return "order is successfully REGISTERED";
+		try {
+			TransactionDetails transDetails1 = findByorder(comdLinePojo);
+
+			if (transDetails1 == null || transDetails1.getStatus().equalsIgnoreCase("REVERSED")) {
+				transDetails.setAmount(comdLinePojo.getAmount());
+				transDetails.setClientId(comdLinePojo.getClientId());
+				transDetails.setCurrency(comdLinePojo.getCurrency());
+				transDetails.setDate(java.time.LocalDate.now());
+				transDetails.setOrderId(comdLinePojo.getOrderId());
+				transDetails.setPayMethod(comdLinePojo.getPayMethod());
+				transDetails.setPayTokenId(comdLinePojo.getPayTokenId());
+				transDetails.setTransactionType(comdLinePojo.getTransactionType());
+				transDetails.setStatus("REGISTERED");
+				transDetalRepo.save(transDetails);
+				return "register: status='SUCCESS'";
+
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return "order already exists in the database";
 
 	}
 
 	@Override
 	public String authoriseTransaction(CommandLinePojo comdLinePojo) {
-		TransactionDetails transDetails = transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-		String tranStatus = transDetails.getStatus();
+		try {
+			TransactionDetails transDetails = findByorder(comdLinePojo);
+			String tranStatus = transDetails.getStatus();
+			System.out.println(tranStatus);
 
-		if (transDetails == null) {
-			return "order does NOT exist";
+			if (!(transDetails.getAmount().equals(comdLinePojo.getAmount()))) {
+				return "Entered amount is not correct";
+			} else if ((!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency()))) {
+				return "Entered Currency Does not match with record";
+			} else if (tranStatus.equalsIgnoreCase("REGISTERED")) {
 
-		} else if (comparePojo != true) {
-			return "Entered values 'amount, currency, payMethod' donot match with the REGISTERED data";
+				int trans = transDetalRepo.updateRegiStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
+				return "authorise: status='SUCCESS'";
+			} else
+				return "transaction is not in REGISTERED state ";
 
-		} else if (tranStatus != "REGISTERED") {
-			return "transaction is not in REGISTERED state ";
-		} else if (tranStatus == "REVERSED") {
-			return "transaction is in REVERSED state ";
-		} else
-
-			transDetalRepo.updateRegiStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-		return "order is successfully AUTHORISED";
+		} catch (Exception e) {
+			e.printStackTrace();// logger.error ("My error message");
+		}
+		return "Entered order details not found";
 
 	}
 
 	@Override
 	public String captureTransaction(CommandLinePojo comdLinePojo) {
-		String tranStatus = transDetails.getStatus();
+		try {
+			TransactionDetails transDetails = findByorder(comdLinePojo);
 
-		if (transDetails == null) {
-			return "order does NOT exist";
+			if (transDetails == null) {
+				return "orderId not found";
+			} else if (!transDetails.getAmount().equals(comdLinePojo.getAmount())) {
+				return "Entered amount is not correct";
+			} else if (!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency())) {
+				return "Entered Currency Does not match with record";
+			} else if (transDetails.getStatus().equalsIgnoreCase("REVERSED")) {
+				return "Order is Cancelled, please register again to proceed";
+			} else if (transDetails.getStatus().equalsIgnoreCase("AUTHORISED")) {
+				transDetalRepo.updateAuthStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
+				return "capture: status='SUCCESS'";
+			} else
+				return "transaction is not in AUTHORISED state ";
 
-		} else if (comparePojo != true) {
-			return "Entered values 'amount, currency, payMethod' donot match with the REGISTERED data";
-
-		} else if (tranStatus != "AUTHORISED") {
-			return "transaction is not in AUTHORISED state ";
-		} else if (tranStatus == "REVERSED") {
-			return "transaction is Cancelled  ";
-		} else
-
-			transDetalRepo.updateAuthStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-		return "order is successfully CAPTURED";
+		} catch (Exception e) {
+			// logger.error ("My error message");
+		}
+		return "Entered order details not found";
 
 	}
 
 	@Override
 	public String reverseTransaction(CommandLinePojo comdLinePojo) {
-		String tranStatus = transDetails.getStatus();
 
-		if (transDetails == null) {
-			return "order does NOT exist";
+		try {
+			TransactionDetails transDetails = findByorder(comdLinePojo);
+			String tranStatus = transDetails.getStatus();
 
-		} else if (comparePojo != true) {
-			return "Entered values 'amount, currency, payMethod' donot match with the REGISTERED data";
-
-		} else if (tranStatus == "REVERSED") {
-			return "transaction is  already Cancelled  ";
-		} else
-
-			transDetalRepo.reverseTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-		return "order is successfully REVERSED";
+			if (!transDetails.getAmount().equals(comdLinePojo.getAmount())) {
+				return "Entered amount is not correct";
+			} else if (!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency())) {
+				return "Entered Currency Does not match with record";
+			} else if (tranStatus.equalsIgnoreCase("REVERSED")) {
+				return "Order is Cancelled, please register again to proceed";
+			} else {
+				transDetalRepo.reverseTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
+				return "reverse: status='SUCCESS'";
+			}
+		} catch (Exception e) {
+			// logger.error ("My error message");
+		}
+		return "Entered order details not found";
 
 	}
 
 	@Override
-	public TransactionDetails findPendingTransactions() {
-		TransactionDetails pendingtransDetails = transDetalRepo.findPendingTransations(comdLinePojo.getClientId());
+	public List<TransactionDetails> findPendingTransactions(CommandLinePojo comdLinePojo) {
+		List<TransactionDetails> pendingtransDetails = transDetalRepo.findPendingTransations(comdLinePojo.getClientId());
 		return pendingtransDetails;
 	}
 
 	@Override
 	public Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo) {
-		// Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(),
-		// comdLinePojo.getStrDate(),comdLinePojo.getEndDate());
-		return 0;
+		Integer total = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(),comdLinePojo.getStrDate(),comdLinePojo.getEndDate());
+		return total;
 	}
 
 }
