@@ -67,7 +67,9 @@ $ java -jar paymentprovider.jar register --clientId="IBE" --orderId="book-37843"
 register: status="ERROR", message="Invalid payment method PAYPAL"
 
 /
+
 /
+
 /
 
 
@@ -112,4 +114,84 @@ clientId="IBE", orderId="book-33256", amount="750", currency="EUR", payMethod="C
 Non-functional Requirements
 
 •	Application should be a standalone Java application and preferred technology stack is: Java 8, MySql, Spring, Hibernate, Log4j, Maven.
+
+
+
+
+Results:
+
+
+register --clientId="IBE" --orderId="book-37843" --transactionType="REGISTER" --amount="250" --currency="EUR" --payMethod="CARD" --payTokenId="cc-367b9832f651a01"
+
+**register: status='SUCCESS'**
+
+
+register --clientId="AMD" --orderId="book-25896" --transactionType="REGISTER" --amount="150" --currency="EUR" --payMethod="CASH" --payTokenId="cc-367b9832f651a11"
+
+**register: status='SUCCESS'**
+
+
+authorise --clientId="AMD" --orderId="book-25896" --transactionType="AUTHORISE" --amount="150" --currency="EUR" --payMethod="CASH" --payTokenId="cc-367b9832f651a11"
+
+**authorise: status='SUCCESS'**
+
+
+authorise --clientId="IBE" --orderId="book-37843" --transactionType="AUTHORISE" --amount="250" --currency="EUR" --payMethod="CARD" --payTokenId="cc-367b9832f651a01"
+
+**authorise: status='SUCCESS'**
+
+
+capture --clientId="AMD" --orderId="book-25896" --transactionType="CAPTURE" --amount="150" --currency="EUR" --payMethod="CASH" --payTokenId="cc-367b9832f651a11"
+
+**capture: status='SUCCESS'**
+
+
+findPending --clientId="AMD"
+
+**null**
+
+
+
+findPending --clientId="IBE"
+
+**{"clientId":"IBE","orderId":"book-37843","date":{"year":2020,"month":1,"day":26},"amount":250,"currency":"EUR","payMethod":"CARD","transactionType":"REGISTER","payTokenId":"cc-367b9832f651a01","status":"AUTHORISED"}**
+
+
+
+capture --clientId="AMD" --orderId="book-25896" --transactionType="CAPTURE" --amount="150" --currency="INR" --payMethod="CASH" --payTokenId="cc-367b9832f651a11"
+
+**status='ERROR', message='Invalid currency INR or payment Method - CASH**
+
+
+
+
+reverse --clientId="IBE" --orderId="book-37843" --amount="250" --currency="EUR" --payMethod="CARD" --payTokenId="cc-367b9832f651a01"
+
+**reverse: status='SUCCESS'**
+
+
+reverse --clientId="AMD" --orderId="book-25896" --amount="150" --currency="EUR" --payMethod="CASH" --payTokenId="cc-367b9832f651a11"
+
+**reverse: status='SUCCESS'**
+
+
+authorise --clientId="IBE" --orderId="book-37843" --transactionType="AUTHORISE" --amount="250" --currency="EUR" --payMethod="CARD" --payTokenId="cc-367b9832f651a01"
+
+**status='ERROR', message='transaction is not in REGISTERED state**
+
+
+findByOrder --clientId="IBE" --orderId="book-37843"
+
+**{"clientId":"IBE","orderId":"book-37843","date":{"year":2020,"month":1,"day":26},"amount":250,"currency":"EUR","payMethod":"CARD","transactionType":"REGISTER","payTokenId":"cc-367b9832f651a01","status":"REVERSED"}**
+
+
+
+
+
+
+
+
+
+
+
 
