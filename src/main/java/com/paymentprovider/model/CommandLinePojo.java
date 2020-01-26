@@ -1,7 +1,8 @@
 package com.paymentprovider.model;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class CommandLinePojo {
 
 	private String clientId;
@@ -11,8 +12,8 @@ public class CommandLinePojo {
 	private String currency;
 	private String payMethod;
 	private String payTokenId;
-	private LocalDate strDate;
-	private LocalDate endDate;
+	private String strDate;
+	private String endDate;
 
 	public String getClientId() {
 		return clientId;
@@ -50,7 +51,7 @@ public class CommandLinePojo {
 		return currency;
 	}
 
-	public void setCurrency(String currency) {
+	public void setCurrency(String currency)  {
 		this.currency = currency;
 	}
 
@@ -70,19 +71,19 @@ public class CommandLinePojo {
 		this.payTokenId = payTokenId;
 	}
 
-	public LocalDate getStrDate() {
+	public String getStrDate() {
 		return strDate;
 	}
 
-	public void setStrDate(LocalDate strDate) {
+	public void setStrDate(String strDate) {
 		this.strDate = strDate;
 	}
 
-	public LocalDate getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 

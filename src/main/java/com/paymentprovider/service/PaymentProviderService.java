@@ -1,13 +1,11 @@
 package com.paymentprovider.service;
 
-import java.util.List;
-
 import com.paymentprovider.model.CommandLinePojo;
 import com.paymentprovider.model.TransactionDetails;
 
 public interface PaymentProviderService {
 
-	String registerNewTransaction(CommandLinePojo comdLinePojo) throws Exception;
+	String registerNewTransaction(CommandLinePojo comdLinePojo);
 
 	String authoriseTransaction(CommandLinePojo comdLinePojo);
 
@@ -15,10 +13,10 @@ public interface PaymentProviderService {
 
 	String reverseTransaction(CommandLinePojo comdLinePojo);
 
-	Integer findTotalofSuccTransaction(CommandLinePojo comdLinePojo);
+	String findTotalofSuccTransaction(CommandLinePojo comdLinePojo);
 
-	TransactionDetails findByorder(CommandLinePojo comdLinePojo) throws Exception;
+	TransactionDetails findByorder(CommandLinePojo comdLinePojo);
 
-	List<TransactionDetails> findPendingTransactions(CommandLinePojo comdLinePojo);
+	String findPendingTransactions(CommandLinePojo comdLinePojo);
 
 }
