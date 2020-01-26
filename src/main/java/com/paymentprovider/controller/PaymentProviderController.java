@@ -1,10 +1,7 @@
 package com.paymentprovider.controller;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Controller;
@@ -12,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.paymentprovider.PaymentproviderApplication;
 import com.paymentprovider.model.CommandLinePojo;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.service.PaymentProviderService;
@@ -22,8 +18,6 @@ public class PaymentProviderController {
 
 	@Autowired
 	PaymentProviderService ppService;
-
-	private final Logger logger = LoggerFactory.getLogger(PaymentproviderApplication.class);
 
 	public String paymentProvider(ApplicationArguments args) throws Exception {
 
@@ -49,20 +43,6 @@ public class PaymentProviderController {
 
 			ObjectMapper mapper = new ObjectMapper();
 			CommandLinePojo comdLinePojo = mapper.readValue(payload, CommandLinePojo.class);
-
-			if (!(comdLinePojo.getCurrency().equals("EUR") || comdLinePojo.getCurrency().equals("USD")
-					|| comdLinePojo.getCurrency().equals("GBP"))) {
-				logger.info("Input Currency format is not supported");
-				response = " status='ERROR', message='Invalid Currency - " + comdLinePojo.getCurrency();
-				return response;
-			}
-
-			if (!(comdLinePojo.getPayMethod().equals("CARD") || comdLinePojo.getPayMethod().equals("INVOICE")
-					|| comdLinePojo.getPayMethod().equals("CASH"))) {
-				logger.info("Input payMethod format is not supported");
-				response = " status='ERROR', message='Invalid payment method - " + comdLinePojo.getCurrency();
-				return response;
-			}
 
 			switch (method) {
 			case "register":
