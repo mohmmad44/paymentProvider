@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.paymentprovider.model.CommandLinePojo;
+import com.paymentprovider.model.PaymentProviderException;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.service.PaymentProviderService;
 
@@ -69,6 +70,8 @@ public class PaymentProviderController {
 
 			}
 
+		}catch (PaymentProviderException e) {
+			response = e.getErrMessage();
 		} catch (Exception e) {
 			response = e.getLocalizedMessage();
 		}

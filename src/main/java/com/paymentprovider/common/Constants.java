@@ -23,6 +23,10 @@ public interface Constants {
 	public static String REVERSE = "REVERSE";
 
 	public static String ERROR = "status='ERROR'";
+	public static String EntityNotFoundException = " NO data found in the records with the given orderId";
+	public static String RollbackException = " OrderId is already exist in the records";
+	public static String PersistenceException = " Error while updating the Record";
+	
 
 	public static String SUCCESS = ": status='SUCCESS'";
 	public static String STATUSERROR = "status='ERROR', message='transaction status is not in expected state";

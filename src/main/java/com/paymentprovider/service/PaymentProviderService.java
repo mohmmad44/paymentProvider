@@ -1,22 +1,23 @@
 package com.paymentprovider.service;
 
 import com.paymentprovider.model.CommandLinePojo;
+import com.paymentprovider.model.PaymentProviderException;
 import com.paymentprovider.model.TransactionDetails;
 
 public interface PaymentProviderService {
 
-	String registerNewTransaction(CommandLinePojo comdLinePojo);
+	String registerNewTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
-	String authoriseTransaction(CommandLinePojo comdLinePojo);
+	String authoriseTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
-	String captureTransaction(CommandLinePojo comdLinePojo);
+	String captureTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
-	String reverseTransaction(CommandLinePojo comdLinePojo);
+	String reverseTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
-	String findTotalofSuccTransaction(CommandLinePojo comdLinePojo);
+	String findTotalofSuccTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
-	TransactionDetails findByorder(CommandLinePojo comdLinePojo);
+	TransactionDetails findByorder(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
-	String findPendingTransactions(CommandLinePojo comdLinePojo);
+	String findPendingTransactions(CommandLinePojo comdLinePojo) throws PaymentProviderException;
 
 }

@@ -3,6 +3,10 @@ package com.paymentprovider.serviceImpl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceException;
+import javax.persistence.RollbackException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,7 @@ import com.google.gson.Gson;
 import com.paymentprovider.PaymentproviderApplication;
 import com.paymentprovider.common.Constants;
 import com.paymentprovider.model.CommandLinePojo;
+import com.paymentprovider.model.PaymentProviderException;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.repository.TransactionDetailsRepository;
 import com.paymentprovider.service.PaymentProviderService;
@@ -23,27 +28,37 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Autowired
 	TransactionDetailsRepository transDetalRepo;
-	
-	
-	
+	@Autowired
+	PaymentProviderException paymentProviderException;
+
 	Logger logger = LoggerFactory.getLogger(PaymentproviderApplication.class);
 
-	
-	
 	/*
 	 * find the transactions from the data base for the given clientId and orderId;
-	 * @see com.paymentprovider.service.PaymentProviderService#findByorder(com.paymentprovider.model.CommandLinePojo)
+	 * 
+	 * @see com.paymentprovider.service.PaymentProviderService#findByorder(com.
+	 * paymentprovider.model.CommandLinePojo)
 	 */
-	
+
 	@Override
-	public TransactionDetails findByorder(CommandLinePojo comdLinePojo) {
+	public TransactionDetails findByorder(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside findByOrder");
-		return transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
+		try {
+			return transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
+		} catch (EntityNotFoundException e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+			throw paymentProviderException;
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(e.getMessage());
+			throw paymentProviderException;
+		}
 	}
-	
-	
+
 	/*
-	 * method to verify only supported Currency and PaymentType 
+	 * method to verify only supported Currency and PaymentType
 	 */
 
 	public boolean variablesCheck(CommandLinePojo comdLinePojo) {
@@ -63,15 +78,17 @@ public class PaymentProviderImpl implements PaymentProviderService {
 		return true;
 	}
 
-	
-	
 	/*
-	 * register the transaction by satisfying the conditions i.e, if orderId not exist or orderId status should be Reversed
-	 * @see com.paymentprovider.service.PaymentProviderService#registerNewTransaction(com.paymentprovider.model.CommandLinePojo)
+	 * register the transaction by satisfying the conditions i.e, if orderId not
+	 * exist or orderId status should be Reversed
+	 * 
+	 * @see
+	 * com.paymentprovider.service.PaymentProviderService#registerNewTransaction(com
+	 * .paymentprovider.model.CommandLinePojo)
 	 */
-	
+
 	@Override
-	public String registerNewTransaction(CommandLinePojo comdLinePojo) {
+	public String registerNewTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside registerNewTransation");
 		String response = null;
 		boolean variblesCheck = variablesCheck(comdLinePojo);
@@ -80,8 +97,8 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			TransactionDetails transDetails = new TransactionDetails();
 			try {
 				TransactionDetails transDetailsDb = this.findByorder(comdLinePojo);
-				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
-						&& (transDetailsDb == null || transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED))) {
+				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER) && (transDetailsDb == null
+						|| transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED))) {
 					transDetails.setAmount(comdLinePojo.getAmount());
 					transDetails.setClientId(comdLinePojo.getClientId());
 					transDetails.setCurrency(comdLinePojo.getCurrency());
@@ -92,17 +109,29 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					transDetails.setTransactionType(comdLinePojo.getTransactionType());
 					transDetails.setStatus(Constants.REGISTERED);
 					transDetalRepo.save(transDetails);
-					response = Constants.REGISTER.concat(Constants.SUCCESS) ;
+					response = Constants.REGISTER.concat(Constants.SUCCESS);
 				} else
 					response = "order already exists in the database";
 
-			} catch (Exception e) {
-				response = e.getMessage();
+			} catch (EntityNotFoundException e) {
 				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+				throw paymentProviderException;
+
+			} catch (RollbackException e) {
+				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(Constants.RollbackException);
+				throw paymentProviderException;
+
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(e.getMessage());
+				throw paymentProviderException;
+
 			}
 
 		} else
-			response =  Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
+			response = Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
 	}
 
@@ -116,7 +145,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	 */
 
 	@Override
-	public String authoriseTransaction(CommandLinePojo comdLinePojo) {
+	public String authoriseTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside authoriseTransation()");
 		String response = null;
 
@@ -138,12 +167,23 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					response = Constants.AUTHORISE.concat(Constants.SUCCESS);
 				} else
 					response = Constants.STATUSERROR;
-			} catch (Exception e) {
-				response = e.getMessage();
+			}catch (EntityNotFoundException e) {
 				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+				throw paymentProviderException;
+
+			} catch (PersistenceException e) {
+				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(Constants.PersistenceException);
+				throw paymentProviderException;
+
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(e.getMessage());
+				throw paymentProviderException;
 			}
 		} else
-			response =  Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
+			response = Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
 	}
 
@@ -156,7 +196,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	 */
 
 	@Override
-	public String captureTransaction(CommandLinePojo comdLinePojo) {
+	public String captureTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside captureTransaction()");
 		String response = null;
 
@@ -174,28 +214,40 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				} else if (!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency())) {
 					response = Constants.ERROR.concat(Constants.CURRENCYERROR);
 				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.REVERSED)) {
-					response =  Constants.ERROR.concat(Constants.CANCELEEDORDER);
+					response = Constants.ERROR.concat(Constants.CANCELEEDORDER);
 				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.AUTHORISED)) {
 					transDetalRepo.updateAuthStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 					response = "capture: status='SUCCESS'";
 				} else
 					response = Constants.ERROR.concat(Constants.STATUSERROR);
-			} catch (Exception e) {
-				response = e.getMessage();
+			} catch (EntityNotFoundException e) {
 				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+				throw paymentProviderException;
+
+			} catch (PersistenceException e) {
+				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(Constants.PersistenceException);
+				throw paymentProviderException;
+
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				paymentProviderException.setErrMessage(e.getMessage());
+				throw paymentProviderException;
 			}
 		} else
-			response =  Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
+			response = Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
 	}
 
 	/*
 	 * 
 	 * To cancel the transaction by changing status to REVERSED
-	 * com.paymentprovider.service.PaymentProviderService#reverseTransaction(com.paymentprovider.model.CommandLinePojo)
+	 * com.paymentprovider.service.PaymentProviderService#reverseTransaction(com.
+	 * paymentprovider.model.CommandLinePojo)
 	 */
 	@Override
-	public String reverseTransaction(CommandLinePojo comdLinePojo) {
+	public String reverseTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside reverseTransaction()");
 		String response = null;
 		try {
@@ -213,9 +265,20 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				transDetalRepo.reverseTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 				return Constants.REVERSE.concat(Constants.SUCCESS);
 			}
-		} catch (Exception e) {
-			response = e.getMessage();
+		} catch (EntityNotFoundException e) {
 			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+			throw paymentProviderException;
+
+		} catch (PersistenceException e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(Constants.PersistenceException);
+			throw paymentProviderException;
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(e.getMessage());
+			throw paymentProviderException;
 		}
 		return response;
 	}
@@ -229,16 +292,27 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	 */
 
 	@Override
-	public String findPendingTransactions(CommandLinePojo comdLinePojo) {
+	public String findPendingTransactions(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside findPendingTransactions");
 		String response = null;
 		try {
 			Gson gson = new Gson();
 			response = gson.toJson(transDetalRepo.findPendingTransations(comdLinePojo.getClientId()));
 
-		} catch (Exception e) {
-			response = e.getMessage();
+		} catch (EntityNotFoundException e) {
 			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+			throw paymentProviderException;
+
+		} catch (PersistenceException e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(Constants.PersistenceException);
+			throw paymentProviderException;
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(e.getMessage());
+			throw paymentProviderException;
 		}
 		return response;
 	}
@@ -253,7 +327,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	 */
 
 	@Override
-	public String findTotalofSuccTransaction(CommandLinePojo comdLinePojo) {
+	public String findTotalofSuccTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside findTotal");
 		String response = null;
 		Integer amount = 0;
@@ -262,11 +336,17 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			LocalDate strDate = LocalDate.parse(comdLinePojo.getStrDate(), formatter);
 			LocalDate endDate = LocalDate.parse(comdLinePojo.getEndDate(), formatter);
 			amount = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), strDate, endDate);
-			response= amount!=null ? amount.toString():null;
+			response = amount != null ? amount.toString() : null;
+
+		} catch (EntityNotFoundException e) {
+			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
+			throw paymentProviderException;
 
 		} catch (Exception e) {
-			response = e.getMessage();
 			logger.error(e.getMessage());
+			paymentProviderException.setErrMessage(e.getMessage());
+			throw paymentProviderException;
 		}
 
 		return response;
