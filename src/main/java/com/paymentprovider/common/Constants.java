@@ -17,13 +17,13 @@ public interface Constants {
 	public static String REVERSED = "REVERSED";
 	public static String LOCALDATE = "yyyy-MM-dd";
 
-	public static String REGISTER = "REGISTERE";
+	public static String REGISTER = "REGISTER";
 	public static String AUTHORISE = "AUTHORISE";
 	public static String CAPTURE = "CAPTURE";
 	public static String REVERSE = "REVERSE";
 
 	public static String ERROR = "status='ERROR'";
 
-	public static String SUCCESS = "status='SUCCESS'";
+	public static String SUCCESS = ": status='SUCCESS'";
 	public static String STATUSERROR = "status='ERROR', message='transaction status is not in expected state";
 }
