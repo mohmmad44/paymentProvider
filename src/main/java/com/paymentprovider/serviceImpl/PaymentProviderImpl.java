@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.paymentprovider.PaymentproviderApplication;
+import com.paymentprovider.common.Constants;
 import com.paymentprovider.model.CommandLinePojo;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.repository.TransactionDetailsRepository;
@@ -22,14 +23,28 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Autowired
 	TransactionDetailsRepository transDetalRepo;
-
+	
+	
+	
 	Logger logger = LoggerFactory.getLogger(PaymentproviderApplication.class);
 
+	
+	
+	/*
+	 * find the transactions from the data base for the given clientId and orderId;
+	 * @see com.paymentprovider.service.PaymentProviderService#findByorder(com.paymentprovider.model.CommandLinePojo)
+	 */
+	
 	@Override
 	public TransactionDetails findByorder(CommandLinePojo comdLinePojo) {
 		logger.info("inside findByOrder");
 		return transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 	}
+	
+	
+	/*
+	 * method to verify only supported Currency and PaymentType 
+	 */
 
 	public boolean variablesCheck(CommandLinePojo comdLinePojo) {
 		if (!(comdLinePojo.getCurrency().equals("EUR") || comdLinePojo.getCurrency().equals("USD")
@@ -48,8 +63,13 @@ public class PaymentProviderImpl implements PaymentProviderService {
 		return true;
 	}
 
-	// register the transaction by satisfying the conditions i.e, if orderId not
-	// exist or orderId status should be Reversed
+	
+	
+	/*
+	 * register the transaction by satisfying the conditions i.e, if orderId not exist or orderId status should be Reversed
+	 * @see com.paymentprovider.service.PaymentProviderService#registerNewTransaction(com.paymentprovider.model.CommandLinePojo)
+	 */
+	
 	@Override
 	public String registerNewTransaction(CommandLinePojo comdLinePojo) {
 		logger.info("inside registerNewTransation");
@@ -60,8 +80,8 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			TransactionDetails transDetails = new TransactionDetails();
 			try {
 				TransactionDetails transDetailsDb = this.findByorder(comdLinePojo);
-				if (comdLinePojo.getTransactionType().equalsIgnoreCase("REGISTER")
-						&& (transDetailsDb == null || transDetailsDb.getStatus().equalsIgnoreCase("REVERSED"))) {
+				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
+						&& (transDetailsDb == null || transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED))) {
 					transDetails.setAmount(comdLinePojo.getAmount());
 					transDetails.setClientId(comdLinePojo.getClientId());
 					transDetails.setCurrency(comdLinePojo.getCurrency());
@@ -70,9 +90,9 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					transDetails.setPayMethod(comdLinePojo.getPayMethod());
 					transDetails.setPayTokenId(comdLinePojo.getPayTokenId());
 					transDetails.setTransactionType(comdLinePojo.getTransactionType());
-					transDetails.setStatus("REGISTERED");
+					transDetails.setStatus(Constants.REGISTERED);
 					transDetalRepo.save(transDetails);
-					response = "register: status='SUCCESS'";
+					response = Constants.REGISTER.concat(Constants.SUCCESS) ;
 				} else
 					response = "order already exists in the database";
 
@@ -82,13 +102,19 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			}
 
 		} else
-			response = " status='ERROR', message='Invalid currency " + comdLinePojo.getCurrency()
-					+ " or payment Method - " + comdLinePojo.getPayMethod();
+			response =  Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
 	}
 
-	// Authorize the transaction by satisfying the conditions
-	// i.e, orderId object should not be null & status should be Registered
+	/*
+	 * Authorize the transaction by satisfying the conditions i.e, orderId object
+	 * should not be null & status should be Registered
+	 * 
+	 * @see
+	 * com.paymentprovider.service.PaymentProviderService#authoriseTransaction(com.
+	 * paymentprovider.model.CommandLinePojo)
+	 */
+
 	@Override
 	public String authoriseTransaction(CommandLinePojo comdLinePojo) {
 		logger.info("inside authoriseTransation()");
@@ -100,29 +126,35 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				TransactionDetails transDetails = findByorder(comdLinePojo);
 
 				if (transDetails == null) {
-					response = "status='ERROR', message='orderId not found";
-				} else if (!(comdLinePojo.getTransactionType().equalsIgnoreCase("AUTHORISE"))) {
-					response = "status='ERROR', message='Entered transactionType is not correct";
+					response = Constants.ERROR.concat(Constants.ORDERIDERROR);
+				} else if (!(comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.AUTHORISE))) {
+					response = Constants.ERROR.concat(Constants.TRANSTYPEERROR);
 				} else if (!(transDetails.getAmount().equals(comdLinePojo.getAmount()))) {
-					response = "status='ERROR', message='Entered amount is not correct";
+					response = Constants.ERROR.concat(Constants.AMOUNTERROR);
 				} else if ((!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency()))) {
-					response = "status='ERROR', message='Entered Currency Does not match with record";
-				} else if (transDetails.getStatus().equalsIgnoreCase("REGISTERED")) {
+					response = Constants.ERROR.concat(Constants.CURRENCYERROR);
+				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.REGISTERED)) {
 					transDetalRepo.updateRegiStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-					response = "authorise: status='SUCCESS'";
+					response = Constants.AUTHORISE.concat(Constants.SUCCESS);
 				} else
-					response = "status='ERROR', message='transaction is not in REGISTERED state ";
+					response = Constants.STATUSERROR;
 			} catch (Exception e) {
 				response = e.getMessage();
 				logger.error(e.getMessage());
 			}
 		} else
-			response = " status='ERROR', message='Invalid currency " + comdLinePojo.getCurrency()
-					+ " or payment Method - " + comdLinePojo.getPayMethod();
+			response =  Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
 	}
 
-	// Capture the transaction by satisfying the conditions
+	/*
+	 * Capture the transaction by satisfying the conditions
+	 * 
+	 * @see
+	 * com.paymentprovider.service.PaymentProviderService#captureTransaction(com.
+	 * paymentprovider.model.CommandLinePojo)
+	 */
+
 	@Override
 	public String captureTransaction(CommandLinePojo comdLinePojo) {
 		logger.info("inside captureTransaction()");
@@ -134,48 +166,52 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				TransactionDetails transDetails = findByorder(comdLinePojo);
 
 				if (transDetails == null) {
-					response = "status='ERROR', message='orderId not found";
-				} else if (!(comdLinePojo.getTransactionType().equalsIgnoreCase("CAPTURE"))) {
-					response = "status='ERROR', message='Entered transactionType is not correct";
+					response = Constants.ORDERIDERROR;
+				} else if (!(comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.CAPTURE))) {
+					response = Constants.ERROR.concat(Constants.TRANSTYPEERROR);
 				} else if (!transDetails.getAmount().equals(comdLinePojo.getAmount())) {
-					response = "status='ERROR', message='Entered amount is not correct";
+					response = Constants.ERROR.concat(Constants.AMOUNTERROR);
 				} else if (!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency())) {
-					response = "status='ERROR', message='Entered Currency Does not match with record";
-				} else if (transDetails.getStatus().equalsIgnoreCase("REVERSED")) {
-					response = "status='ERROR', message='Order is Cancelled, please register again to proceed";
-				} else if (transDetails.getStatus().equalsIgnoreCase("AUTHORISED")) {
+					response = Constants.ERROR.concat(Constants.CURRENCYERROR);
+				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.REVERSED)) {
+					response =  Constants.ERROR.concat(Constants.CANCELEEDORDER);
+				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.AUTHORISED)) {
 					transDetalRepo.updateAuthStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 					response = "capture: status='SUCCESS'";
 				} else
-					response = "status='ERROR', message='Entered order details not found";
+					response = Constants.ERROR.concat(Constants.STATUSERROR);
 			} catch (Exception e) {
 				response = e.getMessage();
 				logger.error(e.getMessage());
 			}
 		} else
-			response = " status='ERROR', message='Invalid currency " + comdLinePojo.getCurrency()
-					+ " or payment Method - " + comdLinePojo.getPayMethod();
+			response =  Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
 	}
 
-	// To cancel the transaction by changing status to REVERSED
+	/*
+	 * 
+	 * To cancel the transaction by changing status to REVERSED
+	 * com.paymentprovider.service.PaymentProviderService#reverseTransaction(com.paymentprovider.model.CommandLinePojo)
+	 */
 	@Override
 	public String reverseTransaction(CommandLinePojo comdLinePojo) {
 		logger.info("inside reverseTransaction()");
 		String response = null;
 		try {
+
 			TransactionDetails transDetails = findByorder(comdLinePojo);
 			String tranStatus = transDetails.getStatus();
 
 			if (!transDetails.getAmount().equals(comdLinePojo.getAmount())) {
-				response = "status='ERROR', message='Entered amount is not correct";
+				response = Constants.ERROR.concat(Constants.AMOUNTERROR);
 			} else if (!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency())) {
-				response = "status='ERROR', message='Entered Currency Does not match with record";
-			} else if (tranStatus.equalsIgnoreCase("REVERSED")) {
-				return "status='ERROR', message='Order is Cancelled, please register again to proceed";
+				response = Constants.ERROR.concat(Constants.CURRENCYERROR);
+			} else if (tranStatus.equalsIgnoreCase(Constants.REVERSED)) {
+				return Constants.ERROR.concat(Constants.CANCELEEDORDER);
 			} else {
 				transDetalRepo.reverseTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-				return "reverse: status='SUCCESS'";
+				return Constants.REVERSE.concat(Constants.SUCCESS);
 			}
 		} catch (Exception e) {
 			response = e.getMessage();
@@ -183,6 +219,14 @@ public class PaymentProviderImpl implements PaymentProviderService {
 		}
 		return response;
 	}
+
+	/*
+	 * find pending transactions for a given ClientId
+	 * 
+	 * @see
+	 * com.paymentprovider.service.PaymentProviderService#findPendingTransactions(
+	 * com.paymentprovider.model.CommandLinePojo)
+	 */
 
 	@Override
 	public String findPendingTransactions(CommandLinePojo comdLinePojo) {
@@ -192,9 +236,6 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			Gson gson = new Gson();
 			response = gson.toJson(transDetalRepo.findPendingTransations(comdLinePojo.getClientId()));
 
-			if (response == null) {
-				response = "status='ERROR', message='NO pending transactions";
-			}
 		} catch (Exception e) {
 			response = e.getMessage();
 			logger.error(e.getMessage());
@@ -202,16 +243,26 @@ public class PaymentProviderImpl implements PaymentProviderService {
 		return response;
 	}
 
+	/*
+	 * total amount of captured transactions for a given clientId and given time
+	 * period
+	 * 
+	 * @see
+	 * com.paymentprovider.service.PaymentProviderService#findTotalofSuccTransaction
+	 * (com.paymentprovider.model.CommandLinePojo)
+	 */
+
 	@Override
 	public String findTotalofSuccTransaction(CommandLinePojo comdLinePojo) {
 		logger.info("inside findTotal");
 		String response = null;
+		Integer amount = 0;
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			// convert String to LocalDate
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LOCALDATE);
 			LocalDate strDate = LocalDate.parse(comdLinePojo.getStrDate(), formatter);
 			LocalDate endDate = LocalDate.parse(comdLinePojo.getEndDate(), formatter);
-			response = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), strDate, endDate).toString();
+			amount = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), strDate, endDate);
+			response= amount!=null ? amount.toString():null;
 
 		} catch (Exception e) {
 			response = e.getMessage();
