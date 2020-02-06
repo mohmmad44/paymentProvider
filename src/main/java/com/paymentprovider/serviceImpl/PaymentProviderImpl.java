@@ -167,7 +167,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					response = Constants.AUTHORISE.concat(Constants.SUCCESS);
 				} else
 					response = Constants.STATUSERROR;
-			}catch (EntityNotFoundException e) {
+			} catch (EntityNotFoundException e) {
 				logger.error(e.getMessage());
 				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
 				throw paymentProviderException;

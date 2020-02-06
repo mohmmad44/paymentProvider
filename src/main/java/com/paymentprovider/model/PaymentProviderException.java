@@ -1,7 +1,8 @@
 package com.paymentprovider.model;
 
+import org.springframework.web.bind.annotation.ControllerAdvice;
 
-
+@ControllerAdvice
 public class PaymentProviderException extends Throwable{
 
 	private static final long serialVersionUID = 1L;
