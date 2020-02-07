@@ -10,14 +10,10 @@ import java.util.List;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.annotation.Order;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,54 +42,10 @@ public class ServiceImplTest {
 
 	public static void main(String[] args) {
 
-		Result result = JUnitCore.runClasses(ServiceImplTest.class);
+		 JUnitCore.runClasses(ServiceImplTest.class);
 	}
 
-	public static CommandLinePojo zIbeRegisterobject() {
-		CommandLinePojo transDetails = new CommandLinePojo();
-
-		transDetails.setAmount(250);
-		transDetails.setClientId("IBE");
-		transDetails.setCurrency("EUR");
-		transDetails.setOrderId("book-37847");
-		transDetails.setPayMethod("CARD");
-		transDetails.setPayTokenId("cc-367b9832f657b01");
-		transDetails.setTransactionType("REGISTER");
-
-		return transDetails;
-
-	}
-
-	public static CommandLinePojo zIbmRegisterobject() {
-		CommandLinePojo transDetails = new CommandLinePojo();
-
-		transDetails.setAmount(150);
-		transDetails.setClientId("IBM");
-		transDetails.setCurrency("USD");
-		transDetails.setOrderId("book-37747");
-		transDetails.setPayMethod("CASH");
-		transDetails.setPayTokenId("ca-367b9732g657b01");
-		transDetails.setTransactionType("REGISTER");
-
-		return transDetails;
-
-	}
-
-	public static CommandLinePojo zMdmRegisterobject() {
-		CommandLinePojo transDetails = new CommandLinePojo();
-
-		transDetails.setAmount(50);
-		transDetails.setClientId("MDM");
-		transDetails.setCurrency("GBP");
-		transDetails.setOrderId("book-37689");
-		transDetails.setPayMethod("INVOICE");
-		transDetails.setPayTokenId("in-367g5832i657g01");
-		transDetails.setTransactionType("REGISTER");
-
-		return transDetails;
-
-	}
-
+	
 	@Test
 //	@Order
 	public void aRegisterNewTransactionSuccess() {
@@ -467,7 +419,7 @@ public class ServiceImplTest {
 		System.out.println("Inside reverseTransactionTestSuccess");
 
 		try {
-			CommandLinePojo transDetails3 = ServiceImplTest.zMdmRegisterobject()
+			CommandLinePojo transDetails3 = ServiceImplTest.zMdmRegisterobject();
 
 			transDetails3.setTransactionType("REVERSE");
 
@@ -618,5 +570,51 @@ public class ServiceImplTest {
 		}
 
 	}
+	
+	public static CommandLinePojo zIbeRegisterobject() {
+		CommandLinePojo transDetails = new CommandLinePojo();
+
+		transDetails.setAmount(250);
+		transDetails.setClientId("IBE");
+		transDetails.setCurrency("EUR");
+		transDetails.setOrderId("book-37847");
+		transDetails.setPayMethod("CARD");
+		transDetails.setPayTokenId("cc-367b9832f657b01");
+		transDetails.setTransactionType("REGISTER");
+
+		return transDetails;
+
+	}
+
+	public static CommandLinePojo zIbmRegisterobject() {
+		CommandLinePojo transDetails = new CommandLinePojo();
+
+		transDetails.setAmount(150);
+		transDetails.setClientId("IBM");
+		transDetails.setCurrency("USD");
+		transDetails.setOrderId("book-37747");
+		transDetails.setPayMethod("CASH");
+		transDetails.setPayTokenId("ca-367b9732g657b01");
+		transDetails.setTransactionType("REGISTER");
+
+		return transDetails;
+
+	}
+
+	public static CommandLinePojo zMdmRegisterobject() {
+		CommandLinePojo transDetails = new CommandLinePojo();
+
+		transDetails.setAmount(50);
+		transDetails.setClientId("MDM");
+		transDetails.setCurrency("GBP");
+		transDetails.setOrderId("book-37689");
+		transDetails.setPayMethod("INVOICE");
+		transDetails.setPayTokenId("in-367g5832i657g01");
+		transDetails.setTransactionType("REGISTER");
+
+		return transDetails;
+
+	}
+
 
 }
