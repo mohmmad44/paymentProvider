@@ -1,12 +1,9 @@
 package com.paymentprovider.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -16,8 +13,10 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,29 +33,25 @@ import com.paymentprovider.serviceImpl.PaymentProviderImpl;
 @RunWith(SpringRunner.class)
 @Rollback(false)
 @Transactional
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ServiceImplTest {
 
 	@Autowired
+//	@Mock
 	PaymentProviderImpl payImpl;
 
 	@Autowired
+//	@Mock
 	TransactionDetailsRepository transDetalRepo;
 
 	public static void main(String[] args) {
-		Result result = JUnitCore.runClasses(ServiceImplTest.class);
-		
-		
 
+		Result result = JUnitCore.runClasses(ServiceImplTest.class);
 	}
 
-	
-
-	
-	
 	@Test
-	@Order(1)
-	public void registerNewTransactionSuccess() {
+//	@Order
+	public void aRegisterNewTransactionSuccess() {
 
 		System.out.println("Inside registerNewTransactionSuccess");
 
@@ -89,12 +84,13 @@ public class ServiceImplTest {
 			assertTrue(transDetails.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
 					&& (transDetailsDb == null || transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED)));
 
-			//when(transDetalRepo.save(any(TransactionDetails.class))).thenReturn(new TransactionDetails());
+			// when(transDetalRepo.save(any(TransactionDetails.class))).thenReturn(new
+			// TransactionDetails());
 
 			TransactionDetails saved = transDetalRepo.save(transDetails);
-			
-			//assertThat(saved.getOrderId()).isSameAs(transDetails.getOrderId());
-			
+
+			// assertThat(saved.getOrderId()).isSameAs(transDetails.getOrderId());
+
 			TransactionDetails transDetails2 = new TransactionDetails();
 
 			transDetails2.setAmount(150);
@@ -163,8 +159,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(2)
-	public void registerNewTransactionFailure() {
+//	@Order(2)
+	public void bRegisterNewTransactionFailure() {
 
 		System.out.println("Inside registerNewTransactionFailure");
 
@@ -188,7 +184,6 @@ public class ServiceImplTest {
 			assertTrue("payMethod Format Success", (transDetails.getPayMethod().equals("CARD")
 					|| transDetails.getPayMethod().equals("INVOICE") || transDetails.getPayMethod().equals("CASH")));
 
-			
 			// when(transDetalRepo.save(Mockito.any(TransactionDetails.class))).thenAnswer(i
 			// -> i.getArguments()[0]);
 
@@ -209,7 +204,6 @@ public class ServiceImplTest {
 
 			assertFalse("payMethod Format Success", (transDetails2.getPayMethod().equals("CARD")
 					|| transDetails2.getPayMethod().equals("INVOICE") || transDetails2.getPayMethod().equals("CASH")));
-
 
 			TransactionDetails transDetails3 = new TransactionDetails();
 
@@ -238,7 +232,6 @@ public class ServiceImplTest {
 			assertFalse(transDetails3.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
 					&& (transDetailsDb3 == null || transDetailsDb3.getStatus().equalsIgnoreCase(Constants.REVERSED)));
 
-
 		} catch (PaymentProviderException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -248,11 +241,9 @@ public class ServiceImplTest {
 
 	}
 
-	
-
 	@Test
-	@Order(3)
-	public void authoriseTransactionTestSuccess() {
+//	@Order(3)
+	public void cAuthoriseTransactionTestSuccess() {
 
 		System.out.println("Inside authoriseTransactionTestSuccess");
 
@@ -283,7 +274,6 @@ public class ServiceImplTest {
 					&& (transDetails.getAmount().equals(transDetailsDb.getAmount())
 							&& (transDetails.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
 									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
-			
 
 			transDetalRepo.updateRegiStatus("IBE", "book-37847");
 
@@ -324,12 +314,9 @@ public class ServiceImplTest {
 
 	}
 
-	
-
-	
 	@Test
-	@Order(4)
-	public void findByorderTestSuccess1() {
+//	@Order(4)
+	public void dFindByorderTestSuccess1() {
 		System.out.println("Inside findByorderTest");
 
 		try {
@@ -347,8 +334,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(5)
-	public void findByorderTestSuccess2() {
+//	@Order(5)
+	public void eFindByorderTestSuccess2() {
 		System.out.println("Inside findByorderTest");
 
 		try {
@@ -366,8 +353,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(6)
-	public void findByorderTestSuccess3() {
+//	@Order(6)
+	public void fFindByorderTestSuccess3() {
 		System.out.println("Inside findByorderTest");
 
 		try {
@@ -385,8 +372,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(7)
-	public void findByorderTestFailure1() {
+//	@Order(7)
+	public void gFindByorderTestFailure1() {
 		System.out.println("Inside findByorderTestFailure");
 
 		try {
@@ -404,8 +391,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(8)
-	public void findByorderTestFailure2() {
+//	@Order(8)
+	public void hFindByorderTestFailure2() {
 		System.out.println("Inside findByorderTestFailure");
 
 		try {
@@ -422,8 +409,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(9)
-	public void findByorderTestFailure3() {
+//	@Order(9)
+	public void iFindByorderTestFailure3() {
 		System.out.println("Inside findByorderTestFailure");
 
 		try {
@@ -439,9 +426,10 @@ public class ServiceImplTest {
 		}
 
 	}
+
 	@Test
-	@Order(10)
-	public void captureTransactionTestSuccess() {
+//	@Order(10)
+	public void jCaptureTransactionTestSuccess() {
 
 		System.out.println("Inside captureTransactionTestSuccess");
 
@@ -468,7 +456,7 @@ public class ServiceImplTest {
 			TransactionDetails transDetailsDb = payImpl.findByorder(pojo1);
 
 			assertTrue((transDetails2.getTransactionType().equalsIgnoreCase(Constants.CAPTURE))
-									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.AUTHORISED));
+					&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.AUTHORISED));
 
 			transDetalRepo.updateAuthStatus("IBM", "book-37747");
 
@@ -482,8 +470,8 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(11)
-	public void reverseTransactionTestSuccess() {
+//	@Order(11)
+	public void kReverseTransactionTestSuccess() {
 
 		System.out.println("Inside reverseTransactionTestSuccess");
 
@@ -524,11 +512,10 @@ public class ServiceImplTest {
 			// TODO: handle exception
 		}
 	}
-	
-	
+
 	@Test
-	@Order(12)
-	public void reverseTransactionTestFailure() {
+//	@Order(12)
+	public void lReverseTransactionTestFailure() {
 
 		System.out.println("Inside reverseTransactionTestFailure");
 
@@ -569,11 +556,10 @@ public class ServiceImplTest {
 			// TODO: handle exception
 		}
 	}
-	
 
 	@Test
-	@Order(13)
-	public void authoriseTransactionsTestFailure() {
+//	@Order(13)
+	public void mAuthoriseTransactionsTestFailure() {
 
 		System.out.println("Inside authoriseTransactionsTestFailure");
 
@@ -605,8 +591,6 @@ public class ServiceImplTest {
 							&& (transDetails.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
 									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
 
-
-			
 			TransactionDetails transDetails2 = new TransactionDetails();
 			transDetails2.setAmount(150);
 			transDetails2.setClientId("IBM");
@@ -644,15 +628,9 @@ public class ServiceImplTest {
 
 	}
 
-
-	
-
-	
-	
-	
 	@Test
-	@Order(14)
-	public void findPendingTransactionTestSuccess() {
+//	@Order(14)
+	public void nFindPendingTransactionTestSuccess() {
 
 		System.out.println("Inside findPendingTransactionTestSuccess");
 
@@ -683,30 +661,24 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	@Order(15)
-	public void findTotalofSuccTransactionTestSuccess() {
+//	@Order(15)
+	public void oFindTotalofSuccTransactionTestSuccess() {
 
 		System.out.println("Inside findTotalofSuccTransactionTestSuccess");
 
-		
 		try {
 			Integer amount = transDetalRepo.findTotalAmont("IBM", java.time.LocalDate.now(), java.time.LocalDate.now());
 
 			assertTrue(amount.equals(150));
-			
+
 		} catch (Exception e) {
 			// TODO: handle exception
-		}finally {
-			//transDetalRepo.deleteTransaction("IBE", "book-37847");
-			//transDetalRepo.deleteTransaction("IBM", "book-37747");
-			//transDetalRepo.deleteTransaction("MDM", "book-37689");
+		} finally {
+			// transDetalRepo.deleteTransaction("IBE", "book-37847");
+			// transDetalRepo.deleteTransaction("IBM", "book-37747");
+			// transDetalRepo.deleteTransaction("MDM", "book-37689");
 		}
-		
 
 	}
-
-	
-	
-	
 
 }
