@@ -617,7 +617,7 @@ public class ServiceImplTest {
 							&& (transDetails2.getCurrency().equalsIgnoreCase(transDetailsDb1.getCurrency())
 									&& transDetailsDb1.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
 
-			transDetalRepo.updateRegiStatus("IBM", "book-37747");
+			
 
 		} catch (PaymentProviderException e) {
 			// TODO Auto-generated catch block
@@ -674,9 +674,9 @@ public class ServiceImplTest {
 		} catch (Exception e) {
 			// TODO: handle exception
 		} finally {
-			// transDetalRepo.deleteTransaction("IBE", "book-37847");
-			// transDetalRepo.deleteTransaction("IBM", "book-37747");
-			// transDetalRepo.deleteTransaction("MDM", "book-37689");
+			 transDetalRepo.deleteTransaction("IBE", "book-37847");
+			 transDetalRepo.deleteTransaction("IBM", "book-37747");
+			 transDetalRepo.deleteTransaction("MDM", "book-37689");
 		}
 
 	}
