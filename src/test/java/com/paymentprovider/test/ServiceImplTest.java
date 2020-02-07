@@ -78,8 +78,7 @@ public class ServiceImplTest {
 		return transDetails;
 
 	}
-	
-	
+
 	public static CommandLinePojo zMdmRegisterobject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
 
@@ -123,12 +122,10 @@ public class ServiceImplTest {
 
 			// assertThat(saved.getOrderId()).isSameAs(transDetails.getOrderId());
 
-			
-			
 			/*
 			 * 
 			 */
-			
+
 			CommandLinePojo transDetails2 = ServiceImplTest.zIbmRegisterobject();
 
 			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
@@ -143,24 +140,18 @@ public class ServiceImplTest {
 					&& (transDetailsDb1 == null || transDetailsDb1.getStatus().equalsIgnoreCase(Constants.REVERSED)));
 
 			payImpl.registerNewTransaction(transDetails2);
-			
-			
-			
+
 			/*
 			 * 
 			 */
 
 			CommandLinePojo transDetails3 = ServiceImplTest.zMdmRegisterobject();
 
-		
-
 			assertTrue("Currency Format Success", (transDetails3.getCurrency().equals("EUR")
 					|| transDetails3.getCurrency().equals("USD") || transDetails3.getCurrency().equals("GBP")));
 
 			assertTrue("payMethod Format Success", (transDetails3.getPayMethod().equals("CARD")
 					|| transDetails3.getPayMethod().equals("INVOICE") || transDetails3.getPayMethod().equals("CASH")));
-
-			
 
 			TransactionDetails transDetailsDb3 = payImpl.findByorder(transDetails3);
 
@@ -186,15 +177,13 @@ public class ServiceImplTest {
 
 		try {
 
-			CommandLinePojo transDetails = new CommandLinePojo();
+			/*
+			 * 
+			 */
 
-			transDetails.setAmount(250);
-			transDetails.setClientId("IBE");
+			CommandLinePojo transDetails = ServiceImplTest.zIbeRegisterobject();
+
 			transDetails.setCurrency("INR");
-			transDetails.setOrderId("book-37847");
-			transDetails.setPayMethod("CARD");
-			transDetails.setPayTokenId("cc-367b9832f657b01");
-			transDetails.setTransactionType("REGISTER");
 
 			assertFalse("Currency Format Success", (transDetails.getCurrency().equals("EUR")
 					|| transDetails.getCurrency().equals("USD") || transDetails.getCurrency().equals("GBP")));
@@ -205,15 +194,9 @@ public class ServiceImplTest {
 			// when(transDetalRepo.save(Mockito.any(TransactionDetails.class))).thenAnswer(i
 			// -> i.getArguments()[0]);
 
-			CommandLinePojo transDetails2 = new CommandLinePojo();
+			CommandLinePojo transDetails2 = ServiceImplTest.zIbmRegisterobject();
 
-			transDetails2.setAmount(150);
-			transDetails2.setClientId("IBM");
-			transDetails2.setCurrency("USD");
-			transDetails2.setOrderId("book-37747");
 			transDetails2.setPayMethod("CHECK");
-			transDetails2.setPayTokenId("ca-367b9732g657b01");
-			transDetails2.setTransactionType("REGISTER");
 
 			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
 					|| transDetails2.getCurrency().equals("USD") || transDetails2.getCurrency().equals("GBP")));
@@ -221,14 +204,12 @@ public class ServiceImplTest {
 			assertFalse("payMethod Format Success", (transDetails2.getPayMethod().equals("CARD")
 					|| transDetails2.getPayMethod().equals("INVOICE") || transDetails2.getPayMethod().equals("CASH")));
 
-			CommandLinePojo transDetails3 = new CommandLinePojo();
+			/*
+			 * 
+			 */
 
-			transDetails3.setAmount(50);
-			transDetails3.setClientId("MDM");
-			transDetails3.setCurrency("GBP");
-			transDetails3.setOrderId("book-37689");
-			transDetails3.setPayMethod("INVOICE");
-			transDetails3.setPayTokenId("in-367g5832i657g01");
+			CommandLinePojo transDetails3 = ServiceImplTest.zMdmRegisterobject();
+
 			transDetails3.setTransactionType("REVERSE");
 
 			assertTrue("Currency Format Success", (transDetails3.getCurrency().equals("EUR")
@@ -237,11 +218,7 @@ public class ServiceImplTest {
 			assertTrue("payMethod Format Success", (transDetails3.getPayMethod().equals("CARD")
 					|| transDetails3.getPayMethod().equals("INVOICE") || transDetails3.getPayMethod().equals("CASH")));
 
-			CommandLinePojo pojo3 = new CommandLinePojo();
-			pojo3.setClientId("MDM");
-			pojo3.setOrderId("book-37689");
-
-			TransactionDetails transDetailsDb3 = payImpl.findByorder(pojo3);
+			TransactionDetails transDetailsDb3 = payImpl.findByorder(transDetails3);
 
 			assertFalse(transDetails3.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
 					&& (transDetailsDb3 == null || transDetailsDb3.getStatus().equalsIgnoreCase(Constants.REVERSED)));
@@ -262,14 +239,12 @@ public class ServiceImplTest {
 		System.out.println("Inside authoriseTransactionTestSuccess");
 
 		try {
-			CommandLinePojo transDetails = new CommandLinePojo();
 
-			transDetails.setAmount(250);
-			transDetails.setClientId("IBE");
-			transDetails.setCurrency("EUR");
-			transDetails.setOrderId("book-37847");
-			transDetails.setPayMethod("CARD");
-			transDetails.setPayTokenId("cc-367b9832f657b01");
+			/*
+			 * 
+			 */
+			CommandLinePojo transDetails = ServiceImplTest.zIbeRegisterobject();
+
 			transDetails.setTransactionType("AUTHORISE");
 
 			assertTrue("Currency Format Success", (transDetails.getCurrency().equals("EUR")
@@ -287,13 +262,12 @@ public class ServiceImplTest {
 
 			payImpl.authoriseTransaction(transDetails);
 
-			CommandLinePojo transDetails2 = new CommandLinePojo();
-			transDetails2.setAmount(150);
-			transDetails2.setClientId("IBM");
-			transDetails2.setCurrency("USD");
-			transDetails2.setOrderId("book-37747");
-			transDetails2.setPayMethod("CASH");
-			transDetails2.setPayTokenId("ca-367b9732g657b01");
+			/*
+			 * 
+			 */
+
+			CommandLinePojo transDetails2 = ServiceImplTest.zIbmRegisterobject();
+
 			transDetails2.setTransactionType("AUTHORISE");
 
 			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
@@ -320,6 +294,10 @@ public class ServiceImplTest {
 
 	}
 
+	/*
+	 * 
+	 */
+
 	@Test
 //	@Order(4)
 	public void dFindByorderTestSuccess1() {
@@ -339,6 +317,9 @@ public class ServiceImplTest {
 
 	}
 
+	/*
+	 * 
+	 */
 	@Test
 //	@Order(5)
 	public void eFindByorderTestSuccess2() {
@@ -358,6 +339,9 @@ public class ServiceImplTest {
 
 	}
 
+	/*
+	 * 
+	 */
 	@Test
 //	@Order(6)
 	public void fFindByorderTestSuccess3() {
@@ -377,6 +361,9 @@ public class ServiceImplTest {
 
 	}
 
+	/*
+	 * 
+	 */
 	@Test
 //	@Order(7)
 	public void gFindByorderTestFailure1() {
@@ -396,6 +383,9 @@ public class ServiceImplTest {
 
 	}
 
+	/*
+	 * 
+	 */
 	@Test
 //	@Order(8)
 	public void hFindByorderTestFailure2() {
@@ -414,6 +404,9 @@ public class ServiceImplTest {
 		}
 	}
 
+	/*
+	 * 
+	 */
 	@Test
 //	@Order(9)
 	public void iFindByorderTestFailure3() {
@@ -433,6 +426,9 @@ public class ServiceImplTest {
 
 	}
 
+	/*
+	 * 
+	 */
 	@Test
 //	@Order(10)
 	public void jCaptureTransactionTestSuccess() {
@@ -440,15 +436,8 @@ public class ServiceImplTest {
 		System.out.println("Inside captureTransactionTestSuccess");
 
 		try {
-			CommandLinePojo transDetails2 = new CommandLinePojo();
-			transDetails2.setAmount(150);
-			transDetails2.setClientId("IBM");
-			transDetails2.setCurrency("USD");
-			transDetails2.setOrderId("book-37747");
-			transDetails2.setPayMethod("CASH");
-			transDetails2.setPayTokenId("ca-367b9732g657b01");
+			CommandLinePojo transDetails2 = ServiceImplTest.zIbmRegisterobject();
 			transDetails2.setTransactionType("CAPTURE");
-
 			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
 					|| transDetails2.getCurrency().equals("USD") || transDetails2.getCurrency().equals("GBP")));
 
@@ -478,14 +467,8 @@ public class ServiceImplTest {
 		System.out.println("Inside reverseTransactionTestSuccess");
 
 		try {
-			CommandLinePojo transDetails3 = new CommandLinePojo();
+			CommandLinePojo transDetails3 = ServiceImplTest.zMdmRegisterobject()
 
-			transDetails3.setAmount(50);
-			transDetails3.setClientId("MDM");
-			transDetails3.setCurrency("GBP");
-			transDetails3.setOrderId("book-37689");
-			transDetails3.setPayMethod("INVOICE");
-			transDetails3.setPayTokenId("in-367g5832i657g01");
 			transDetails3.setTransactionType("REVERSE");
 
 			assertTrue("Currency Format Success", (transDetails3.getCurrency().equals("EUR")
@@ -518,14 +501,7 @@ public class ServiceImplTest {
 		System.out.println("Inside reverseTransactionTestFailure");
 
 		try {
-			CommandLinePojo transDetails3 = new CommandLinePojo();
-
-			transDetails3.setAmount(50);
-			transDetails3.setClientId("MDM");
-			transDetails3.setCurrency("GBP");
-			transDetails3.setOrderId("book-37689");
-			transDetails3.setPayMethod("INVOICE");
-			transDetails3.setPayTokenId("in-367g5832i657g01");
+			CommandLinePojo transDetails3 = ServiceImplTest.zMdmRegisterobject();
 			transDetails3.setTransactionType("REVERSE");
 
 			assertTrue("Currency Format Success", (transDetails3.getCurrency().equals("EUR")
@@ -558,14 +534,8 @@ public class ServiceImplTest {
 		System.out.println("Inside authoriseTransactionsTestFailure");
 
 		try {
-			CommandLinePojo transDetails = new CommandLinePojo();
+			CommandLinePojo transDetails = ServiceImplTest.zIbeRegisterobject();
 
-			transDetails.setAmount(250);
-			transDetails.setClientId("IBE");
-			transDetails.setCurrency("EUR");
-			transDetails.setOrderId("book-37847");
-			transDetails.setPayMethod("CARD");
-			transDetails.setPayTokenId("cc-367b9832f657b01");
 			transDetails.setTransactionType("AUTHORISE");
 
 			assertTrue("Currency Format Success", (transDetails.getCurrency().equals("EUR")
@@ -581,13 +551,8 @@ public class ServiceImplTest {
 							&& (transDetails.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
 									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
 
-			CommandLinePojo transDetails2 = new CommandLinePojo();
-			transDetails2.setAmount(150);
-			transDetails2.setClientId("IBM");
-			transDetails2.setCurrency("USD");
-			transDetails2.setOrderId("book-37747");
-			transDetails2.setPayMethod("CASH");
-			transDetails2.setPayTokenId("ca-367b9732g657b01");
+			CommandLinePojo transDetails2 = ServiceImplTest.zIbmRegisterobject();
+
 			transDetails2.setTransactionType("AUTHORISE");
 
 			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
@@ -618,14 +583,7 @@ public class ServiceImplTest {
 
 		System.out.println("Inside findPendingTransactionTestSuccess");
 
-		CommandLinePojo transDetails = new CommandLinePojo();
-
-		transDetails.setAmount(250);
-		transDetails.setClientId("IBE");
-		transDetails.setCurrency("EUR");
-		transDetails.setOrderId("book-37847");
-		transDetails.setPayMethod("CARD");
-		transDetails.setPayTokenId("cc-367b9832f657b01");
+		CommandLinePojo transDetails = ServiceImplTest.zIbeRegisterobject();
 
 		List<TransactionDetails> transDetailsDb = transDetalRepo.findPendingTransations("IBE");
 
