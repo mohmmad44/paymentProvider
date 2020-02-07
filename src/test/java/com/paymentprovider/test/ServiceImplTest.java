@@ -7,12 +7,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.annotation.Order;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +29,10 @@ import com.paymentprovider.serviceImpl.PaymentProviderImpl;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
+@TestMethodOrder(MethodOrderer)
 @Rollback(false)
 @Transactional
+
 public class ServiceImplTest {
 
 	@Autowired
@@ -38,24 +43,17 @@ public class ServiceImplTest {
 
 	public static void main(String[] args) {
 		Result result = JUnitCore.runClasses(ServiceImplTest.class);
-		ServiceImplTest test = new ServiceImplTest();
-		test.registerNewTransactionSuccess();
-		test.findByorderTestSuccess1();
-		test.findByorderTestSuccess2();
-		test.findByorderTestSuccess3();
-		test.findByorderTestFailure1();
-		test.findByorderTestFailure2();
-		test.findByorderTestFailure3();
-		test.authoriseTransactionTest1Success();
-		test.captureTransactionTestSuccess();
-		test.reverseTransactionTestSuccess();
-		test.findTotalofSuccTransactionTestSuccess();
-		test.findPendingTransactionTestSuccess();
+		
 		
 
 	}
 
+	
+
+	
+	
 	@Test
+	@Order(1)
 	public void registerNewTransactionSuccess() {
 
 		System.out.println("Inside registerNewTransactionSuccess");
@@ -161,114 +159,96 @@ public class ServiceImplTest {
 	}
 
 	@Test
-	public void findByorderTestSuccess1() {
-		System.out.println("Inside findByorderTest");
+	@Order(2)
+	public void registerNewTransactionFailure() {
+
+		System.out.println("Inside registerNewTransactionFailure");
 
 		try {
-			CommandLinePojo pojo = new CommandLinePojo();
-			pojo.setClientId("IBE");
-			pojo.setOrderId("book-37847");
 
-			TransactionDetails checkval = payImpl.findByorder(pojo);
-			assertNotNull(checkval);
+			TransactionDetails transDetails = new TransactionDetails();
+
+			transDetails.setAmount(250);
+			transDetails.setClientId("IBE");
+			transDetails.setCurrency("INR");
+			transDetails.setDate(java.time.LocalDate.now());
+			transDetails.setOrderId("book-37847");
+			transDetails.setPayMethod("CARD");
+			transDetails.setPayTokenId("cc-367b9832f657b01");
+			transDetails.setTransactionType("REGISTER");
+			transDetails.setStatus(Constants.REGISTERED);
+
+			assertFalse("Currency Format Success", (transDetails.getCurrency().equals("EUR")
+					|| transDetails.getCurrency().equals("USD") || transDetails.getCurrency().equals("GBP")));
+
+			assertTrue("payMethod Format Success", (transDetails.getPayMethod().equals("CARD")
+					|| transDetails.getPayMethod().equals("INVOICE") || transDetails.getPayMethod().equals("CASH")));
+
+			
+			// when(transDetalRepo.save(Mockito.any(TransactionDetails.class))).thenAnswer(i
+			// -> i.getArguments()[0]);
+
+			TransactionDetails transDetails2 = new TransactionDetails();
+
+			transDetails2.setAmount(150);
+			transDetails2.setClientId("IBM");
+			transDetails2.setCurrency("USD");
+			transDetails2.setDate(java.time.LocalDate.now());
+			transDetails2.setOrderId("book-37747");
+			transDetails2.setPayMethod("CHECK");
+			transDetails2.setPayTokenId("ca-367b9732g657b01");
+			transDetails2.setTransactionType("REGISTER");
+			transDetails2.setStatus(Constants.REGISTERED);
+
+			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
+					|| transDetails2.getCurrency().equals("USD") || transDetails2.getCurrency().equals("GBP")));
+
+			assertFalse("payMethod Format Success", (transDetails2.getPayMethod().equals("CARD")
+					|| transDetails2.getPayMethod().equals("INVOICE") || transDetails2.getPayMethod().equals("CASH")));
+
+
+			TransactionDetails transDetails3 = new TransactionDetails();
+
+			transDetails3.setAmount(50);
+			transDetails3.setClientId("MDM");
+			transDetails3.setCurrency("GBP");
+			transDetails3.setDate(java.time.LocalDate.now());
+			transDetails3.setOrderId("book-37689");
+			transDetails3.setPayMethod("INVOICE");
+			transDetails3.setPayTokenId("in-367g5832i657g01");
+			transDetails3.setTransactionType("REVERSE");
+			transDetails3.setStatus(Constants.REGISTERED);
+
+			assertTrue("Currency Format Success", (transDetails3.getCurrency().equals("EUR")
+					|| transDetails3.getCurrency().equals("USD") || transDetails3.getCurrency().equals("GBP")));
+
+			assertTrue("payMethod Format Success", (transDetails3.getPayMethod().equals("CARD")
+					|| transDetails3.getPayMethod().equals("INVOICE") || transDetails3.getPayMethod().equals("CASH")));
+
+			CommandLinePojo pojo3 = new CommandLinePojo();
+			pojo3.setClientId("MDM");
+			pojo3.setOrderId("book-37689");
+
+			TransactionDetails transDetailsDb3 = payImpl.findByorder(pojo3);
+
+			assertFalse(transDetails3.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
+					&& (transDetailsDb3 == null || transDetailsDb3.getStatus().equalsIgnoreCase(Constants.REVERSED)));
+
+
 		} catch (PaymentProviderException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 
 	}
 
-	@Test
-	public void findByorderTestSuccess2() {
-		System.out.println("Inside findByorderTest");
-
-		try {
-			CommandLinePojo pojo = new CommandLinePojo();
-			pojo.setClientId("IBM");
-			pojo.setOrderId("book-37747");
-
-			TransactionDetails checkval = payImpl.findByorder(pojo);
-			assertNotNull(checkval);
-		} catch (PaymentProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	
 
 	@Test
-	public void findByorderTestSuccess3() {
-		System.out.println("Inside findByorderTest");
-
-		try {
-			CommandLinePojo pojo = new CommandLinePojo();
-			pojo.setClientId("MDM");
-			pojo.setOrderId("book-37689");
-
-			TransactionDetails checkval = payImpl.findByorder(pojo);
-			assertNotNull(checkval);
-		} catch (PaymentProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	@Test
-	public void findByorderTestFailure1() {
-		System.out.println("Inside findByorderTestFailure");
-
-		try {
-			CommandLinePojo pojo = new CommandLinePojo();
-			pojo.setClientId("KJH");
-			pojo.setOrderId("book-37689");
-
-			TransactionDetails checkval = payImpl.findByorder(pojo);
-			assertNull(checkval);
-		} catch (PaymentProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	@Test
-	public void findByorderTestFailure2() {
-		System.out.println("Inside findByorderTestFailure");
-
-		try {
-			CommandLinePojo pojo = new CommandLinePojo();
-			pojo.setClientId("asd");
-			pojo.setOrderId("book-37258");
-
-			TransactionDetails checkval = payImpl.findByorder(pojo);
-			assertNull(checkval);
-		} catch (PaymentProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@Test
-	public void findByorderTestFailure3() {
-		System.out.println("Inside findByorderTestFailure");
-
-		try {
-			CommandLinePojo pojo = new CommandLinePojo();
-			pojo.setClientId("GTF");
-			pojo.setOrderId("book-58947");
-
-			TransactionDetails checkval = payImpl.findByorder(pojo);
-			assertNull(checkval);
-		} catch (PaymentProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	@Test
-	public void authoriseTransactionTest1Success() {
+	@Order(3)
+	public void authoriseTransactionTestSuccess() {
 
 		System.out.println("Inside authoriseTransactionTestSuccess");
 
@@ -299,6 +279,7 @@ public class ServiceImplTest {
 					&& (transDetails.getAmount().equals(transDetailsDb.getAmount())
 							&& (transDetails.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
 									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
+			
 
 			transDetalRepo.updateRegiStatus("IBE", "book-37847");
 
@@ -339,7 +320,123 @@ public class ServiceImplTest {
 
 	}
 
+	
+
+	
 	@Test
+	@Order(4)
+	public void findByorderTestSuccess1() {
+		System.out.println("Inside findByorderTest");
+
+		try {
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("IBE");
+			pojo.setOrderId("book-37847");
+
+			TransactionDetails checkval = payImpl.findByorder(pojo);
+			assertNotNull(checkval);
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	@Order(5)
+	public void findByorderTestSuccess2() {
+		System.out.println("Inside findByorderTest");
+
+		try {
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("IBM");
+			pojo.setOrderId("book-37747");
+
+			TransactionDetails checkval = payImpl.findByorder(pojo);
+			assertNotNull(checkval);
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	@Order(6)
+	public void findByorderTestSuccess3() {
+		System.out.println("Inside findByorderTest");
+
+		try {
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("MDM");
+			pojo.setOrderId("book-37689");
+
+			TransactionDetails checkval = payImpl.findByorder(pojo);
+			assertNotNull(checkval);
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	@Order(7)
+	public void findByorderTestFailure1() {
+		System.out.println("Inside findByorderTestFailure");
+
+		try {
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("KJH");
+			pojo.setOrderId("book-37689");
+
+			TransactionDetails checkval = payImpl.findByorder(pojo);
+			assertNull(checkval);
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	@Order(8)
+	public void findByorderTestFailure2() {
+		System.out.println("Inside findByorderTestFailure");
+
+		try {
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("asd");
+			pojo.setOrderId("book-37258");
+
+			TransactionDetails checkval = payImpl.findByorder(pojo);
+			assertNull(checkval);
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	@Order(9)
+	public void findByorderTestFailure3() {
+		System.out.println("Inside findByorderTestFailure");
+
+		try {
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("GTF");
+			pojo.setOrderId("book-58947");
+
+			TransactionDetails checkval = payImpl.findByorder(pojo);
+			assertNull(checkval);
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	@Test
+	@Order(11)
 	public void captureTransactionTestSuccess() {
 
 		System.out.println("Inside captureTransactionTestSuccess");
@@ -367,9 +464,7 @@ public class ServiceImplTest {
 			TransactionDetails transDetailsDb = payImpl.findByorder(pojo1);
 
 			assertTrue((transDetails2.getTransactionType().equalsIgnoreCase(Constants.CAPTURE))
-					&& (transDetails2.getAmount().equals(transDetailsDb.getAmount())
-							&& (transDetails2.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
-									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.AUTHORISED))));
+									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.AUTHORISED));
 
 			transDetalRepo.updateAuthStatus("IBM", "book-37747");
 
@@ -383,6 +478,7 @@ public class ServiceImplTest {
 	}
 
 	@Test
+	@Order(11)
 	public void reverseTransactionTestSuccess() {
 
 		System.out.println("Inside reverseTransactionTestSuccess");
@@ -424,8 +520,134 @@ public class ServiceImplTest {
 			// TODO: handle exception
 		}
 	}
+	
+	
+	@Test
+	@Order(12)
+	public void reverseTransactionTestFailure() {
+
+		System.out.println("Inside reverseTransactionTestFailure");
+
+		try {
+			TransactionDetails transDetails3 = new TransactionDetails();
+
+			transDetails3.setAmount(50);
+			transDetails3.setClientId("MDM");
+			transDetails3.setCurrency("GBP");
+			transDetails3.setOrderId("book-37689");
+			transDetails3.setPayMethod("INVOICE");
+			transDetails3.setPayTokenId("in-367g5832i657g01");
+			transDetails3.setTransactionType("REVERSE");
+
+			assertTrue("Currency Format Success", (transDetails3.getCurrency().equals("EUR")
+					|| transDetails3.getCurrency().equals("USD") || transDetails3.getCurrency().equals("GBP")));
+
+			assertTrue("payMethod Format Success", (transDetails3.getPayMethod().equals("CARD")
+					|| transDetails3.getPayMethod().equals("INVOICE") || transDetails3.getPayMethod().equals("CASH")));
+
+			CommandLinePojo pojo3 = new CommandLinePojo();
+			pojo3.setClientId("MDM");
+			pojo3.setOrderId("book-37689");
+
+			TransactionDetails transDetailsDb = payImpl.findByorder(pojo3);
+
+			assertFalse((transDetails3.getTransactionType().equalsIgnoreCase(Constants.REVERSE))
+					&& (transDetailsDb.getAmount().equals(transDetailsDb.getAmount())
+							&& (transDetailsDb.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
+									&& (transDetailsDb.getStatus().equalsIgnoreCase(Constants.AUTHORISED)
+											|| transDetailsDb.getStatus().equalsIgnoreCase(Constants.REGISTERED)))));
+			transDetalRepo.reverseTransaction("MDM", "book-37689");
+
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
 
 	@Test
+	@Order(13)
+	public void authoriseTransactionsTestFailure() {
+
+		System.out.println("Inside authoriseTransactionsTestFailure");
+
+		try {
+			TransactionDetails transDetails = new TransactionDetails();
+
+			transDetails.setAmount(250);
+			transDetails.setClientId("IBE");
+			transDetails.setCurrency("EUR");
+			transDetails.setOrderId("book-37847");
+			transDetails.setPayMethod("CARD");
+			transDetails.setPayTokenId("cc-367b9832f657b01");
+			transDetails.setTransactionType("AUTHORISE");
+
+			assertTrue("Currency Format Success", (transDetails.getCurrency().equals("EUR")
+					|| transDetails.getCurrency().equals("USD") || transDetails.getCurrency().equals("GBP")));
+
+			assertTrue("payMethod Format Success", (transDetails.getPayMethod().equals("CARD")
+					|| transDetails.getPayMethod().equals("INVOICE") || transDetails.getPayMethod().equals("CASH")));
+
+			CommandLinePojo pojo = new CommandLinePojo();
+			pojo.setClientId("IBE");
+			pojo.setOrderId("book-37847");
+
+			TransactionDetails transDetailsDb = payImpl.findByorder(pojo);
+
+			assertFalse((transDetails.getTransactionType().equalsIgnoreCase(Constants.AUTHORISE))
+					&& (transDetails.getAmount().equals(transDetailsDb.getAmount())
+							&& (transDetails.getCurrency().equalsIgnoreCase(transDetailsDb.getCurrency())
+									&& transDetailsDb.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
+
+
+			
+			TransactionDetails transDetails2 = new TransactionDetails();
+			transDetails2.setAmount(150);
+			transDetails2.setClientId("IBM");
+			transDetails2.setCurrency("USD");
+			transDetails2.setOrderId("book-37747");
+			transDetails2.setPayMethod("CASH");
+			transDetails2.setPayTokenId("ca-367b9732g657b01");
+			transDetails2.setTransactionType("AUTHORISE");
+
+			assertTrue("Currency Format Success", (transDetails2.getCurrency().equals("EUR")
+					|| transDetails2.getCurrency().equals("USD") || transDetails2.getCurrency().equals("GBP")));
+
+			assertTrue("payMethod Format Success", (transDetails2.getPayMethod().equals("CARD")
+					|| transDetails2.getPayMethod().equals("INVOICE") || transDetails2.getPayMethod().equals("CASH")));
+
+			CommandLinePojo pojo1 = new CommandLinePojo();
+			pojo1.setClientId("IBM");
+			pojo1.setOrderId("book-37747");
+
+			TransactionDetails transDetailsDb1 = payImpl.findByorder(pojo1);
+
+			assertFalse((transDetails2.getTransactionType().equalsIgnoreCase(Constants.AUTHORISE))
+					&& (transDetails2.getAmount().equals(transDetailsDb1.getAmount())
+							&& (transDetails2.getCurrency().equalsIgnoreCase(transDetailsDb1.getCurrency())
+									&& transDetailsDb1.getStatus().equalsIgnoreCase(Constants.REGISTERED))));
+
+			transDetalRepo.updateRegiStatus("IBM", "book-37747");
+
+		} catch (PaymentProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+	}
+
+
+	
+
+	
+	
+	
+	@Test
+	@Order(14)
 	public void findPendingTransactionTestSuccess() {
 
 		System.out.println("Inside findPendingTransactionTestSuccess");
@@ -457,6 +679,7 @@ public class ServiceImplTest {
 	}
 
 	@Test
+	@Order(15)
 	public void findTotalofSuccTransactionTestSuccess() {
 
 		System.out.println("Inside findTotalofSuccTransactionTestSuccess");
@@ -470,9 +693,9 @@ public class ServiceImplTest {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}finally {
-			transDetalRepo.deleteTransaction("IBE", "book-37847");
-			transDetalRepo.deleteTransaction("IBM", "book-37747");
-			transDetalRepo.deleteTransaction("MDM", "book-37689");
+			//transDetalRepo.deleteTransaction("IBE", "book-37847");
+			//transDetalRepo.deleteTransaction("IBM", "book-37747");
+			//transDetalRepo.deleteTransaction("MDM", "book-37689");
 		}
 		
 
