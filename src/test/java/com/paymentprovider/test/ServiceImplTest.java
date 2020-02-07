@@ -1,9 +1,12 @@
 package com.paymentprovider.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -29,7 +32,6 @@ import com.paymentprovider.serviceImpl.PaymentProviderImpl;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@TestMethodOrder(MethodOrderer)
 @Rollback(false)
 @Transactional
 
@@ -87,10 +89,12 @@ public class ServiceImplTest {
 			assertTrue(transDetails.getTransactionType().equalsIgnoreCase(Constants.REGISTER)
 					&& (transDetailsDb == null || transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED)));
 
-			transDetalRepo.save(transDetails);
-			// when(transDetalRepo.save(Mockito.any(TransactionDetails.class))).thenAnswer(i
-			// -> i.getArguments()[0]);
+			//when(transDetalRepo.save(any(TransactionDetails.class))).thenReturn(new TransactionDetails());
 
+			TransactionDetails saved = transDetalRepo.save(transDetails);
+			
+			//assertThat(saved.getOrderId()).isSameAs(transDetails.getOrderId());
+			
 			TransactionDetails transDetails2 = new TransactionDetails();
 
 			transDetails2.setAmount(150);
@@ -436,7 +440,7 @@ public class ServiceImplTest {
 
 	}
 	@Test
-	@Order(11)
+	@Order(10)
 	public void captureTransactionTestSuccess() {
 
 		System.out.println("Inside captureTransactionTestSuccess");
