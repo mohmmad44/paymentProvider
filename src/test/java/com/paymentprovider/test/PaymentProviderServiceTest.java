@@ -2,11 +2,9 @@ package com.paymentprovider.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +49,7 @@ public class PaymentProviderServiceTest {
 
 		System.out.println("Inside registerNewTransactionSuccessTest");
 
-		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoobject();
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
 		TransactionDetails transReturn = new TransactionDetails();
 		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transReturn);
@@ -65,7 +63,7 @@ public class PaymentProviderServiceTest {
 
 		System.out.println("Inside registerNewTransactionSuccessTest");
 
-		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoobject();
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
 		transDetails.setCurrency("INR");
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
 		TransactionDetails transReturn = new TransactionDetails();
@@ -81,20 +79,21 @@ public class PaymentProviderServiceTest {
 
 		System.out.println("Inside registerNewTransactionSuccessTest");
 
-		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoobject();
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NullPointerException.class);
 		assertEquals(null, paymentProviderService.registerNewTransaction(transDetails));
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void aRegisterNewTransactionExceptionTest2() throws PaymentProviderException {
 
 		System.out.println("Inside registerNewTransactionSuccessTest");
 
-		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoobject();
-		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NoSuchElementException.class);
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class)))
+				.thenThrow(NoSuchElementException.class);
 		assertEquals(null, paymentProviderService.registerNewTransaction(transDetails));
 
 	}
@@ -102,7 +101,7 @@ public class PaymentProviderServiceTest {
 	@Test
 	public void aRegisterNewTransactionNegativeTest2() throws PaymentProviderException {
 
-		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoobject();
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
 		TransactionDetails transDetails2 = new TransactionDetails();
 		transDetails2.setStatus((Constants.AUTHORISE));
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetails2);
@@ -111,7 +110,65 @@ public class PaymentProviderServiceTest {
 
 	}
 
-	public static CommandLinePojo ibeClientCommandLinePojoobject() {
+	@Test
+	public void authoriseTransactionTest() throws PaymentProviderException {
+
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
+		transDetails.setTransactionType(Constants.AUTHORISE);
+		TransactionDetails transDetailsDbMock = PaymentProviderServiceTest.ibeClientTransactionDetailsPojoObject();
+		Integer transactionDetailsDb = 1;
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		when(transDetailRepo.updateRegiStatus(transDetails.getClientId(), transDetails.getOrderId()))
+				.thenReturn(transactionDetailsDb);
+		assertEquals(Constants.AUTHORISE.concat(Constants.SUCCESS),
+				paymentProviderService.authoriseTransaction(transDetails));
+
+	}
+
+	@Test
+	public void authoriseTransactionNegtiveTest() throws PaymentProviderException {
+
+		CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
+		transDetails.setTransactionType(Constants.AUTHORISE);
+		TransactionDetails transDetailsDbMock = PaymentProviderServiceTest.ibeClientTransactionDetailsPojoObject();
+		Integer transactionDetailsDb = 1;
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		when(transDetailRepo.updateRegiStatus(transDetails.getClientId(), transDetails.getOrderId()))
+				.thenReturn(transactionDetailsDb);
+		assertEquals(Constants.AUTHORISE.concat(Constants.SUCCESS),
+				paymentProviderService.authoriseTransaction(transDetails));
+
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
+		assertEquals(Constants.ERROR.concat(Constants.ORDERIDERROR),
+				paymentProviderService.authoriseTransaction(transDetails));
+
+		
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetails.setTransactionType(Constants.REGISTER);
+		assertEquals(Constants.ERROR.concat(Constants.TRANSTYPEERROR),
+				paymentProviderService.authoriseTransaction(transDetails));
+
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetails.setTransactionType(Constants.AUTHORISE);
+		transDetails.setAmount(150);
+		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
+				paymentProviderService.authoriseTransaction(transDetails));
+
+//		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+//		transDetails.setAmount(250);
+//		transDetails.setCurrency("INR");
+//		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR),
+//				paymentProviderService.authoriseTransaction(transDetails));
+
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetails.setAmount(250);
+		transDetailsDbMock.setStatus(Constants.CAPTURED);
+		assertEquals(Constants.STATUSERROR, paymentProviderService.authoriseTransaction(transDetails));
+
+		
+	}
+
+	public static CommandLinePojo ibeClientCommandLinePojoObject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
 		transDetails.setAmount(250);
 		transDetails.setClientId("IBE");
@@ -122,7 +179,18 @@ public class PaymentProviderServiceTest {
 		transDetails.setTransactionType("REGISTER");
 		return transDetails;
 	}
-	
-	
+
+	public static TransactionDetails ibeClientTransactionDetailsPojoObject() {
+		TransactionDetails transDetails = new TransactionDetails();
+		transDetails.setAmount(250);
+		transDetails.setClientId("IBE");
+		transDetails.setCurrency("EUR");
+		transDetails.setOrderId("book-37847");
+		transDetails.setPayMethod("CARD");
+		transDetails.setPayTokenId("cc-367b9832f657b01");
+		transDetails.setTransactionType("AUTHORISE");
+		transDetails.setStatus("REGISTERED");
+		return transDetails;
+	}
 
 }
