@@ -21,6 +21,7 @@ import com.paymentprovider.model.PaymentProviderException;
 import com.paymentprovider.model.TransactionDetails;
 import com.paymentprovider.repository.TransactionDetailsRepository;
 import com.paymentprovider.service.PaymentProviderService;
+import com.paymentprovider.util.PaymentProviderUtil;
 
 @Service
 @Transactional
@@ -30,6 +31,8 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	TransactionDetailsRepository transDetalRepo;
 	@Autowired
 	PaymentProviderException paymentProviderException;
+	@Autowired
+	PaymentProviderUtil paymentProviderUtil;
 
 	Logger logger = LoggerFactory.getLogger(PaymentproviderApplication.class);
 
@@ -43,18 +46,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	@Override
 	public TransactionDetails findByorder(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside findByOrder");
-		try {
-			return transDetalRepo.findTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-		} catch (EntityNotFoundException e) {
-			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-			throw paymentProviderException;
-
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(e.getMessage());
-			throw paymentProviderException;
-		}
+		return paymentProviderUtil.findByorder(comdLinePojo);
 	}
 
 	/*
@@ -96,8 +88,8 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 			TransactionDetails transDetails = new TransactionDetails();
 			try {
-				TransactionDetails transDetailsDb = this.findByorder(comdLinePojo);
-				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER) && (transDetailsDb == null
+				TransactionDetails transDetailsDb = paymentProviderUtil.findByorder(comdLinePojo);
+				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER) && (null == transDetailsDb 
 						|| transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED))) {
 					transDetails.setAmount(comdLinePojo.getAmount());
 					transDetails.setClientId(comdLinePojo.getClientId());
@@ -113,10 +105,11 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				} else
 					response = "order already exists in the database";
 
-			} catch (EntityNotFoundException e) {
+			} catch (NullPointerException e) {
 				logger.error(e.getMessage());
 				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-				throw paymentProviderException;
+				System.out.println(e.getLocalizedMessage());
+				return e.getLocalizedMessage();
 
 			} catch (RollbackException e) {
 				logger.error(e.getMessage());
@@ -125,8 +118,9 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(e.getMessage());
-				throw paymentProviderException;
+				paymentProviderException.setErrMessage(e.getLocalizedMessage());
+				System.out.println(e.getLocalizedMessage());
+				return e.getLocalizedMessage();
 
 			}
 
