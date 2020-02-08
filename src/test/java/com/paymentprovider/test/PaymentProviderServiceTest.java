@@ -50,163 +50,153 @@ public class PaymentProviderServiceTest {
 	CommandLinePojo transDetails = PaymentProviderServiceTest.ibeClientCommandLinePojoObject();
 	TransactionDetails transDetailsDbMock = PaymentProviderServiceTest.ibeClientTransactionDetailsPojoObject();
 
+	/*
+	 * SUCCESSFULL Variable Check
+	 */
 	@Test
-	public void aRegisterNewTransactionTest() throws PaymentProviderException {
+	public void variablesCheckCurrencyTest() throws PaymentProviderException {
+		transDetails.setCurrency("GBP");
+		assertEquals(true, paymentProviderService.variablesCheck(transDetails));
+	}
 
-		System.out.println("Inside registerNewTransactionSuccessTest");
+	@Test
+	public void variablesCheckNegativeCurrencyTest() throws PaymentProviderException {
+		transDetails.setCurrency("INR");
+		assertEquals(false, paymentProviderService.variablesCheck(transDetails));
+	}
 
+	@Test
+	public void variablesCheckNagativePayMethodTest() throws PaymentProviderException {
+		transDetails.setPayMethod("CHECK");
+		assertEquals(false, paymentProviderService.variablesCheck(transDetails));
+	}
+
+	/*
+	 * SUCCESSFULL REGISTER transaction
+	 */
+	@Test
+	public void registerNewTransactionTest() throws PaymentProviderException {
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
 		TransactionDetails transReturn = new TransactionDetails();
 		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transReturn);
 		assertEquals(Constants.REGISTER.concat(Constants.SUCCESS),
 				paymentProviderService.registerNewTransaction(transDetails));
-
 	}
 
 	@Test
-	public void aRegisterNewTransactionNegativeTest() throws PaymentProviderException {
+	public void registerNewTransactionNegativeCurrencyTest() throws PaymentProviderException {
 		transDetails.setCurrency("INR");
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
 		TransactionDetails transReturn = new TransactionDetails();
 		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transReturn);
 		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR),
 				paymentProviderService.registerNewTransaction(transDetails));
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void aRegisterNewTransactionExceptionTest() throws PaymentProviderException {
-		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NullPointerException.class);
-		assertEquals(null, paymentProviderService.registerNewTransaction(transDetails));
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void aRegisterNewTransactionExceptionTest2() throws PaymentProviderException {
-		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class)))
-				.thenThrow(NoSuchElementException.class);
-		assertEquals(null, paymentProviderService.registerNewTransaction(transDetails));
-
 	}
 
 	@Test
-	public void aRegisterNewTransactionNegativeTest2() throws PaymentProviderException {
+	public void registerNewTransactionNegativeStatusTest() throws PaymentProviderException {
 		TransactionDetails transDetails2 = new TransactionDetails();
 		transDetails2.setStatus((Constants.AUTHORISE));
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetails2);
 		assertEquals("order already exists in the database",
 				paymentProviderService.registerNewTransaction(transDetails));
-
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void registerNewTransactionExceptionTest() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NullPointerException.class);
+		assertEquals(null, paymentProviderService.registerNewTransaction(transDetails));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void registerNewTransactionExceptionTest2() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class)))
+				.thenThrow(NoSuchElementException.class);
+		assertEquals(null, paymentProviderService.registerNewTransaction(transDetails));
+	}
+
+	/*
+	 * SUCCESSFULL AUTHORISED transaction
+	 */
 	@Test
 	public void authoriseTransactionTest() throws PaymentProviderException {
 		transDetails.setTransactionType(Constants.AUTHORISE);
-
-		/*
-		 * Negative Test, Db return value mock as null
-		 */
-		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
-		assertEquals(Constants.ERROR.concat(Constants.ORDERIDERROR),
-				paymentProviderService.authoriseTransaction(transDetails));
-
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
-
-		/*
-		 * Negative Test, command line transaction type set as REGISTER
-		 */
-		transDetails.setTransactionType(Constants.REGISTER);
-		assertEquals(Constants.ERROR.concat(Constants.TRANSTYPEERROR),
-				paymentProviderService.authoriseTransaction(transDetails));
-
-		/*
-		 * Negative Test, command line Amount value is given false
-		 */
-		transDetails.setTransactionType(Constants.AUTHORISE);
-		transDetails.setAmount(150);
-		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
-				paymentProviderService.authoriseTransaction(transDetails));
-
-		/*
-		 * Negative Test, Transaction status in Db is other than REGISTERED
-		 */
-		transDetails.setAmount(250);
-		transDetailsDbMock.setStatus(Constants.CAPTURED);
-		assertEquals(Constants.STATUSERROR, paymentProviderService.authoriseTransaction(transDetails));
-
-		/*
-		 * Negative Test, Given CommandLine Currency is not supported
-		 */
-		transDetails.setTransactionType(Constants.AUTHORISE);
-		transDetails.setCurrency("INR");
-		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR),
-				paymentProviderService.authoriseTransaction(transDetails));
-
-		/*
-		 * SUCCESSFULL AUTHORISED transaction
-		 */
-		transDetails.setCurrency("EUR");
 		Integer transactionDetailsDb = 1;
 		transDetailsDbMock.setStatus(Constants.REGISTERED);
 		when(transDetailRepo.updateRegiStatus(transDetails.getClientId(), transDetails.getOrderId()))
 				.thenReturn(transactionDetailsDb);
 		assertEquals(Constants.AUTHORISE.concat(Constants.SUCCESS),
 				paymentProviderService.authoriseTransaction(transDetails));
-
 	}
 
 	@Test
-	public void captureTransactionTest() throws PaymentProviderException {
-		transDetails.setTransactionType(Constants.CAPTURE);
-		/*
-		 * Negative Test, Db return value set as null
-		 */
+	public void authoriseDbReturnNullNegtiveTransactionTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.AUTHORISE);
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
 		assertEquals(Constants.ERROR.concat(Constants.ORDERIDERROR),
-				paymentProviderService.captureTransaction(transDetails));
+				paymentProviderService.authoriseTransaction(transDetails));
+	}
 
-		/*
-		 * Negative Test, command line transaction type set as REGISTER
-		 */
+	@Test
+	public void authoriseFalseTransactionTypeNegtiveTransactionTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.AUTHORISE);
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		transDetails.setTransactionType(Constants.REGISTER);
 		assertEquals(Constants.ERROR.concat(Constants.TRANSTYPEERROR),
-				paymentProviderService.captureTransaction(transDetails));
+				paymentProviderService.authoriseTransaction(transDetails));
+	}
 
-		/*
-		 * Negative Test command line Amount value is given false
-		 */
-		transDetails.setTransactionType(Constants.CAPTURE);
+	@Test
+	public void authoriseFalseAmountNegtiveTransactionTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.AUTHORISE);
 		transDetails.setAmount(150);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
-				paymentProviderService.captureTransaction(transDetails));
+				paymentProviderService.authoriseTransaction(transDetails));
+	}
 
-		/*
-		 * Negative Test Given CommandLine Currency is not supported
-		 */
-		transDetails.setAmount(250);
+	@Test
+	public void authoriseTransactionNegtiveDbStatusTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.AUTHORISE);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetailsDbMock.setStatus(Constants.CAPTURED);
+		assertEquals(Constants.STATUSERROR, paymentProviderService.authoriseTransaction(transDetails));
+	}
+
+	@Test
+	public void authoriseTransactionFalseCurrencyNegtiveTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.AUTHORISE);
 		transDetails.setCurrency("INR");
 		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR),
-				paymentProviderService.captureTransaction(transDetails));
+				paymentProviderService.authoriseTransaction(transDetails));
+	}
 
-		/*
-		 * Negative Test Transaction status in Db is other than REGISTERED
-		 */
-		transDetails.setCurrency("EUR");
-		transDetailsDbMock.setStatus(Constants.REVERSED);
-		assertEquals(Constants.ERROR.concat(Constants.CANCELEEDORDER),
-				paymentProviderService.captureTransaction(transDetails));
+	@SuppressWarnings("unchecked")
+	@Test
+	public void authoriseTransactionExceptionTest() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NullPointerException.class);
+		assertEquals(null, paymentProviderService.authoriseTransaction(transDetails));
+	}
 
-		transDetailsDbMock.setStatus(Constants.CAPTURED);
-		assertEquals(Constants.ERROR.concat(Constants.STATUSERROR),
-				paymentProviderService.captureTransaction(transDetails));
+	@SuppressWarnings("unchecked")
+	@Test
+	public void authoriseTransactionExceptionTest2() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class)))
+				.thenThrow(NoSuchElementException.class);
+		assertEquals(null, paymentProviderService.authoriseTransaction(transDetails));
+	}
 
-		/*
-		 * SUCCESSFULL AUTHORISED transaction
-		 */
+	/*
+	 * SUCCESSFULL AUTHORISED transaction
+	 */
+	@Test
+	public void captureTransactionTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.CAPTURE);
 		Integer transactionDetailsDb = 1;
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		transDetailsDbMock.setStatus(Constants.AUTHORISED);
 		when(transDetailRepo.updateAuthStatus(transDetails.getClientId(), transDetails.getOrderId()))
 				.thenReturn(transactionDetailsDb);
@@ -215,46 +205,160 @@ public class PaymentProviderServiceTest {
 
 	}
 
+	/*
+	 * Negative Test, Db return value set as null
+	 */
+	@Test
+	public void captureTransactionNegativeDbFindTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.CAPTURE);
+
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
+		assertEquals(Constants.ERROR.concat(Constants.ORDERIDERROR),
+				paymentProviderService.captureTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test, command line transaction type set as REGISTER
+	 */
+	@Test
+	public void captureTransactionNegativeTransactionTypeTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.REGISTER);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		assertEquals(Constants.ERROR.concat(Constants.TRANSTYPEERROR),
+				paymentProviderService.captureTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test command line Amount value is given false
+	 */
+	@Test
+	public void captureTransactionNegativeAmountTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.CAPTURE);
+		transDetails.setAmount(150);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
+				paymentProviderService.captureTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test Given CommandLine Currency is not supported
+	 */
+	@Test
+	public void captureTransactionNegativeCurrencyTest() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetails.setCurrency("INR");
+		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR),
+				paymentProviderService.captureTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test Transaction status in Db is other than REGISTERED
+	 */
+	@Test
+	public void captureTransactionNegativeStatusTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.CAPTURE);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetailsDbMock.setStatus(Constants.REVERSED);
+		assertEquals(Constants.ERROR.concat(Constants.CANCELEEDORDER),
+				paymentProviderService.captureTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test Transaction status in Db is other than REGISTERED
+	 */
+	@Test
+	public void captureTransactionNegativeCapturedStatusTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.CAPTURE);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetailsDbMock.setStatus(Constants.CAPTURED);
+		assertEquals(Constants.ERROR.concat(Constants.STATUSERROR),
+				paymentProviderService.captureTransaction(transDetails));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void captureTransactionExceptionTest() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NullPointerException.class);
+		assertEquals(null, paymentProviderService.captureTransaction(transDetails));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void captureTransactionExceptionTest2() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class)))
+				.thenThrow(NoSuchElementException.class);
+		assertEquals(null, paymentProviderService.captureTransaction(transDetails));
+	}
+
+	/*
+	 * SUCCESSFULL AUTHORISED transaction
+	 */
 	@Test
 	public void reverseTransactionTest() throws PaymentProviderException {
 		transDetails.setTransactionType(Constants.REVERSE);
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
-
-		/*
-		 * Negative Test command line Amount value is given false
-		 */
-		transDetails.setAmount(150);
-		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
-				paymentProviderService.reverseTransaction(transDetails));
-
-		/*
-		 * Negative Test Given CommandLine Currency is not supported
-		 */
-		transDetails.setAmount(250);
-		transDetails.setCurrency("INR");
-		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR),
-				paymentProviderService.reverseTransaction(transDetails));
-
-		/*
-		 * Negative Test Transaction status in Db is other than REGISTERED
-		 */
-		transDetails.setCurrency("EUR");
-		transDetailsDbMock.setStatus(Constants.REVERSED);
-		assertEquals(Constants.ERROR.concat(Constants.CANCELEEDORDER),
-				paymentProviderService.reverseTransaction(transDetails));
-
-		/*
-		 * SUCCESSFULL AUTHORISED transaction
-		 */
 		Integer transactionDetailsDb = 1;
 		transDetailsDbMock.setStatus(Constants.AUTHORISED);
 		when(transDetailRepo.updateAuthStatus(transDetails.getClientId(), transDetails.getOrderId()))
 				.thenReturn(transactionDetailsDb);
 		assertEquals(Constants.REVERSE.concat(Constants.SUCCESS),
 				paymentProviderService.reverseTransaction(transDetails));
-
 	}
 
+	/*
+	 * Negative Test command line Amount value is given false
+	 */
+	@Test
+	public void reverseTransactionNegativeAmountTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.REVERSE);
+		transDetails.setAmount(150);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
+				paymentProviderService.reverseTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test Given CommandLine Currency is not supported
+	 */
+	@Test
+	public void reverseTransactionNegtiveCurrencyTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.REVERSE);
+		transDetails.setCurrency("INR");
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR),
+				paymentProviderService.reverseTransaction(transDetails));
+	}
+
+	/*
+	 * Negative Test Transaction status in Db is other than REGISTERED
+	 */
+	@Test
+	public void reverseTransactionNegtiveStatusTest() throws PaymentProviderException {
+		transDetails.setTransactionType(Constants.REVERSE);
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
+		transDetailsDbMock.setStatus(Constants.REVERSED);
+		assertEquals(Constants.ERROR.concat(Constants.CANCELEEDORDER),
+				paymentProviderService.reverseTransaction(transDetails));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void reverseTransactionExceptionTest() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenThrow(NullPointerException.class);
+		assertEquals(null, paymentProviderService.reverseTransaction(transDetails));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void reverseTransactionExceptionTest2() throws PaymentProviderException {
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class)))
+				.thenThrow(NoSuchElementException.class);
+		assertEquals(null, paymentProviderService.reverseTransaction(transDetails));
+	}
+
+	/*
+	 * find Pending Transactions Test
+	 */
 	@Test
 	public void findPendingTransactions() throws PaymentProviderException {
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
@@ -263,7 +367,14 @@ public class PaymentProviderServiceTest {
 		Gson gson = new Gson();
 		String response = gson.toJson(transactionDetailsDb);
 		assertEquals(response, paymentProviderService.findPendingTransactions(transDetails));
+	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void findPendingTransactionsExceptionTest() throws PaymentProviderException {
+		Mockito.when(transDetailRepo.findPendingTransations(transDetails.getClientId()))
+				.thenThrow(NullPointerException.class);
+		assertEquals(null, paymentProviderService.findPendingTransactions(transDetails));
 	}
 
 	public static CommandLinePojo ibeClientCommandLinePojoObject() {

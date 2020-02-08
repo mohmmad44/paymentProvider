@@ -29,8 +29,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 	@Autowired
 	TransactionDetailsRepository transDetalRepo;
-	@Autowired
-	PaymentProviderException paymentProviderException;
+
 	@Autowired
 	PaymentProviderUtil paymentProviderUtil;
 
@@ -89,7 +88,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			TransactionDetails transDetails = new TransactionDetails();
 			try {
 				TransactionDetails transDetailsDb = paymentProviderUtil.findByorder(comdLinePojo);
-				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER) && (null == transDetailsDb 
+				if (comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.REGISTER) && (null == transDetailsDb
 						|| transDetailsDb.getStatus().equalsIgnoreCase(Constants.REVERSED))) {
 					transDetails.setAmount(comdLinePojo.getAmount());
 					transDetails.setClientId(comdLinePojo.getClientId());
@@ -107,23 +106,11 @@ public class PaymentProviderImpl implements PaymentProviderService {
 
 			} catch (NullPointerException e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-				System.out.println(e.getLocalizedMessage());
 				return e.getLocalizedMessage();
-
-			} catch (RollbackException e) {
-				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(Constants.RollbackException);
-				throw paymentProviderException;
-
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(e.getLocalizedMessage());
-				System.out.println(e.getLocalizedMessage());
 				return e.getLocalizedMessage();
-
 			}
-
 		} else
 			response = Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
 		return response;
@@ -159,20 +146,12 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					response = Constants.AUTHORISE.concat(Constants.SUCCESS);
 				} else
 					response = Constants.STATUSERROR;
-			} catch (EntityNotFoundException e) {
+			} catch (NullPointerException e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-				throw paymentProviderException;
-
-			} catch (PersistenceException e) {
-				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(Constants.PersistenceException);
-				throw paymentProviderException;
-
+				return e.getLocalizedMessage();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(e.getMessage());
-				throw paymentProviderException;
+				return e.getLocalizedMessage();
 			}
 		} else
 			response = Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
@@ -210,20 +189,12 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					response = Constants.CAPTURE.concat(Constants.SUCCESS);
 				} else
 					response = Constants.ERROR.concat(Constants.STATUSERROR);
-			} catch (EntityNotFoundException e) {
+			} catch (NullPointerException e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-				throw paymentProviderException;
-
-			} catch (PersistenceException e) {
-				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(Constants.PersistenceException);
-				throw paymentProviderException;
-
+				return e.getLocalizedMessage();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				paymentProviderException.setErrMessage(e.getMessage());
-				throw paymentProviderException;
+				return e.getLocalizedMessage();
 			}
 		} else
 			response = Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR);
@@ -241,7 +212,6 @@ public class PaymentProviderImpl implements PaymentProviderService {
 		logger.info("inside reverseTransaction()");
 		String response = null;
 		try {
-
 			TransactionDetails transDetails = findByorder(comdLinePojo);
 			String tranStatus = transDetails.getStatus();
 
@@ -255,20 +225,13 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				transDetalRepo.reverseTransaction(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 				return Constants.REVERSE.concat(Constants.SUCCESS);
 			}
-		} catch (EntityNotFoundException e) {
+		} catch (NullPointerException e) {
 			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-			throw paymentProviderException;
-
-		} catch (PersistenceException e) {
-			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(Constants.PersistenceException);
-			throw paymentProviderException;
+			return e.getLocalizedMessage();
 
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(e.getMessage());
-			throw paymentProviderException;
+			return e.getLocalizedMessage();
 		}
 		return response;
 	}
@@ -289,20 +252,9 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			Gson gson = new Gson();
 			response = gson.toJson(transDetalRepo.findPendingTransations(comdLinePojo.getClientId()));
 
-		} catch (EntityNotFoundException e) {
-			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-			throw paymentProviderException;
-
-		} catch (PersistenceException e) {
-			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(Constants.PersistenceException);
-			throw paymentProviderException;
-
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(e.getMessage());
-			throw paymentProviderException;
+			return e.getLocalizedMessage();
 		}
 		return response;
 	}
@@ -328,17 +280,14 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			amount = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), strDate, endDate);
 			response = amount != null ? amount.toString() : null;
 
-		} catch (EntityNotFoundException e) {
+		} catch (NullPointerException e) {
 			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(Constants.EntityNotFoundException);
-			throw paymentProviderException;
+			return e.getLocalizedMessage();
 
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			paymentProviderException.setErrMessage(e.getMessage());
-			throw paymentProviderException;
+			return e.getLocalizedMessage();
 		}
-
 		return response;
 	}
 
