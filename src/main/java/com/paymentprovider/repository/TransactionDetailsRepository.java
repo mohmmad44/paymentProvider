@@ -22,7 +22,7 @@ public interface TransactionDetailsRepository extends JpaRepository<TransactionD
 	
 	@Modifying
 	@Query("update TransactionDetails as a set a.status='CAPTURED' where a.clientId = ?1 and a.orderId = ?2")
-	void updateAuthStatus(String clientId, String orderId);
+	int updateAuthStatus(String clientId, String orderId);
 	
 	@Modifying
 	@Query("update TransactionDetails as a set a.status='REVERSED' where a.clientId = ?1 and a.orderId = ?2")

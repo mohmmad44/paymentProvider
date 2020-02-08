@@ -154,8 +154,6 @@ public class PaymentProviderImpl implements PaymentProviderService {
 					response = Constants.ERROR.concat(Constants.TRANSTYPEERROR);
 				} else if (!(transDetails.getAmount().equals(comdLinePojo.getAmount()))) {
 					response = Constants.ERROR.concat(Constants.AMOUNTERROR);
-				} else if ((!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency()))) {
-					response = Constants.ERROR.concat(Constants.CURRENCYERROR);
 				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.REGISTERED)) {
 					transDetalRepo.updateRegiStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
 					response = Constants.AUTHORISE.concat(Constants.SUCCESS);
@@ -200,18 +198,16 @@ public class PaymentProviderImpl implements PaymentProviderService {
 				TransactionDetails transDetails = findByorder(comdLinePojo);
 
 				if (transDetails == null) {
-					response = Constants.ORDERIDERROR;
+					response = Constants.ERROR.concat(Constants.ORDERIDERROR);
 				} else if (!(comdLinePojo.getTransactionType().equalsIgnoreCase(Constants.CAPTURE))) {
 					response = Constants.ERROR.concat(Constants.TRANSTYPEERROR);
 				} else if (!transDetails.getAmount().equals(comdLinePojo.getAmount())) {
 					response = Constants.ERROR.concat(Constants.AMOUNTERROR);
-				} else if (!transDetails.getCurrency().equalsIgnoreCase(comdLinePojo.getCurrency())) {
-					response = Constants.ERROR.concat(Constants.CURRENCYERROR);
 				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.REVERSED)) {
 					response = Constants.ERROR.concat(Constants.CANCELEEDORDER);
 				} else if (transDetails.getStatus().equalsIgnoreCase(Constants.AUTHORISED)) {
 					transDetalRepo.updateAuthStatus(comdLinePojo.getClientId(), comdLinePojo.getOrderId());
-					response = "capture: status='SUCCESS'";
+					response = Constants.CAPTURE.concat(Constants.SUCCESS);
 				} else
 					response = Constants.ERROR.concat(Constants.STATUSERROR);
 			} catch (EntityNotFoundException e) {
