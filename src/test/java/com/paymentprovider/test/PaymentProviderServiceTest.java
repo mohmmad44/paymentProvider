@@ -77,8 +77,7 @@ public class PaymentProviderServiceTest {
 	@Test
 	public void registerNewTransactionTest() throws PaymentProviderException {
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
-		TransactionDetails transReturn = new TransactionDetails();
-		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transReturn);
+		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transDetailsDbMock);
 		assertEquals(Constants.REGISTER.concat(Constants.SUCCESS),
 				paymentProviderService.registerNewTransaction(transDetails));
 	}
@@ -87,17 +86,15 @@ public class PaymentProviderServiceTest {
 	public void registerNewTransactionNegativeCurrencyTest() throws PaymentProviderException {
 		transDetails.setCurrency("INR");
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(null);
-		TransactionDetails transReturn = new TransactionDetails();
-		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transReturn);
+		when(transDetailRepo.save(any(TransactionDetails.class))).thenReturn(transDetailsDbMock);
 		assertEquals(Constants.ERROR.concat(Constants.CURRENCYERROR).concat(Constants.PAYMENTTYPEERROR),
 				paymentProviderService.registerNewTransaction(transDetails));
 	}
 
 	@Test
 	public void registerNewTransactionNegativeStatusTest() throws PaymentProviderException {
-		TransactionDetails transDetails2 = new TransactionDetails();
-		transDetails2.setStatus((Constants.AUTHORISE));
-		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetails2);
+		transDetailsDbMock.setStatus((Constants.AUTHORISED));
+		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		assertEquals("order already exists in the database",
 				paymentProviderService.registerNewTransaction(transDetails));
 	}
