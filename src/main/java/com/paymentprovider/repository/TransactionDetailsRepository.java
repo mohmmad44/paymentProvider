@@ -30,9 +30,9 @@ public interface TransactionDetailsRepository extends JpaRepository<TransactionD
 
 	@Query("select a from TransactionDetails as a where a.clientId = ?1 and (a.status='REGISTERED' or a.status='AUTHORISED')")
 	List<TransactionDetails> findPendingTransations(String clientId);
-
-	@Query("select sum(a.amount) from TransactionDetails as a where a.clientId = ?1 and (a.date between ?2 and ?3)  and a.status='CAPTURED'")
-	Integer findTotalAmont(String clientId, LocalDate strDate, LocalDate endDate);
+	
+	@Query("select sum((a.amount)*(case when a.currency='EUR' THEN  1 WHEN a.currency='USD' THEN 0.9 WHEN a.currency='GBP' THEN 1.2 END)) from TransactionDetails as a where a.clientId = ?1 and (a.date between ?2 and ?3) and a.status='CAPTURED'") 
+	Double findTotalAmont(String clientId, LocalDate strDate, LocalDate endDate);
 	
 	@Modifying
 	@Query("delete from TransactionDetails where clientId = ?1 and orderId = ?2")

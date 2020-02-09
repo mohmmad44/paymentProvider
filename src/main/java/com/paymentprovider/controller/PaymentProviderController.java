@@ -25,7 +25,7 @@ public class PaymentProviderController {
 		String response = "";
 
 		try {
-			String method = args.getNonOptionArgs().get(0).toString();
+			String method = args.getNonOptionArgs().get(0);
 			Class<CommandLinePojo> aClass = CommandLinePojo.class;
 			Field[] fields = aClass.getDeclaredFields();
 

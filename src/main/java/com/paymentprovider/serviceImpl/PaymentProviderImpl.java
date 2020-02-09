@@ -3,10 +3,6 @@ package com.paymentprovider.serviceImpl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -272,11 +268,13 @@ public class PaymentProviderImpl implements PaymentProviderService {
 	public String findTotalofSuccTransaction(CommandLinePojo comdLinePojo) throws PaymentProviderException {
 		logger.info("inside findTotal");
 		String response = null;
-		Integer amount = 0;
+		Double amount = 0.00;
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LOCALDATE);
 			LocalDate strDate = LocalDate.parse(comdLinePojo.getStrDate(), formatter);
 			LocalDate endDate = LocalDate.parse(comdLinePojo.getEndDate(), formatter);
+			System.out.println(strDate);
+			System.out.println(endDate);
 			amount = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), strDate, endDate);
 			response = amount != null ? amount.toString() : null;
 

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -366,6 +368,8 @@ public class PaymentProviderServiceTest {
 		assertEquals(response, paymentProviderService.findPendingTransactions(transDetails));
 	}
 
+	
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void findPendingTransactionsExceptionTest() throws PaymentProviderException {
@@ -373,6 +377,41 @@ public class PaymentProviderServiceTest {
 				.thenThrow(NullPointerException.class);
 		assertEquals(null, paymentProviderService.findPendingTransactions(transDetails));
 	}
+	
+	@Test
+	public void findTotalofSuccTransactionTest() throws PaymentProviderException {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LOCALDATE);
+		LocalDate strDate = LocalDate.parse(transDetails.getStrDate(), formatter);
+		LocalDate endDate = LocalDate.parse(transDetails.getEndDate(), formatter);
+		Mockito.when(transDetailRepo.findTotalAmont(transDetails.getClientId(), strDate,endDate)).thenReturn(250.00);
+		assertEquals("250.0", paymentProviderService.findTotalofSuccTransaction(transDetails));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void findTotalofSuccTransactionExceptionTest() throws PaymentProviderException {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LOCALDATE);
+		LocalDate strDate = LocalDate.parse(transDetails.getStrDate(), formatter);
+		LocalDate endDate = LocalDate.parse(transDetails.getEndDate(), formatter);
+		Mockito.when(transDetailRepo.findTotalAmont(transDetails.getClientId(), strDate,endDate))
+				.thenThrow(NullPointerException.class);
+		assertEquals(null, paymentProviderService.findTotalofSuccTransaction(transDetails));
+		
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void findTotalofSuccTransactionExceptionTest2() throws PaymentProviderException {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LOCALDATE);
+		LocalDate strDate = LocalDate.parse(transDetails.getStrDate(), formatter);
+		LocalDate endDate = LocalDate.parse(transDetails.getEndDate(), formatter);
+		Mockito.when(transDetailRepo.findTotalAmont(transDetails.getClientId(), strDate,endDate))
+				.thenThrow(NoSuchElementException.class);
+		assertEquals(null, paymentProviderService.findTotalofSuccTransaction(transDetails));
+	}
+	
+	
 
 	public static CommandLinePojo ibeClientCommandLinePojoObject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
@@ -383,6 +422,8 @@ public class PaymentProviderServiceTest {
 		transDetails.setPayMethod("CARD");
 		transDetails.setPayTokenId("cc-367b9832f657b01");
 		transDetails.setTransactionType("REGISTER");
+		transDetails.setStrDate("2020-02-09");
+		transDetails.setEndDate("2020-02-10");
 		return transDetails;
 	}
 

@@ -1,7 +1,6 @@
 package com.paymentprovider.common;
 
 public interface Constants {
-
 	public static final String ORDERIDERROR = " , message='orderId not found";
 	public static final String PAYMENTTYPEERROR = " , message='Entered PAYMENT TYPE Does not SUPPORT";
 	public static final String TRANSTYPEERROR = " ,message='Entered transactionType is not correct";
