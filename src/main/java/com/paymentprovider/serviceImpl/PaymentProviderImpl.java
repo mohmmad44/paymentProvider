@@ -273,8 +273,7 @@ public class PaymentProviderImpl implements PaymentProviderService {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LOCALDATE);
 			LocalDate strDate = LocalDate.parse(comdLinePojo.getStrDate(), formatter);
 			LocalDate endDate = LocalDate.parse(comdLinePojo.getEndDate(), formatter);
-			System.out.println(strDate);
-			System.out.println(endDate);
+			
 			amount = transDetalRepo.findTotalAmont(comdLinePojo.getClientId(), strDate, endDate);
 			response = amount != null ? amount.toString() : null;
 

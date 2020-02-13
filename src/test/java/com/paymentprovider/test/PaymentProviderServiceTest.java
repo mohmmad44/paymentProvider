@@ -151,7 +151,7 @@ public class PaymentProviderServiceTest {
 	@Test
 	public void authoriseFalseAmountNegtiveTransactionTest() throws PaymentProviderException {
 		transDetails.setTransactionType(Constants.AUTHORISE);
-		transDetails.setAmount(150);
+		transDetails.setAmount(150.00);
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
 				paymentProviderService.authoriseTransaction(transDetails));
@@ -233,7 +233,7 @@ public class PaymentProviderServiceTest {
 	@Test
 	public void captureTransactionNegativeAmountTest() throws PaymentProviderException {
 		transDetails.setTransactionType(Constants.CAPTURE);
-		transDetails.setAmount(150);
+		transDetails.setAmount(150.00);
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
 				paymentProviderService.captureTransaction(transDetails));
@@ -310,7 +310,7 @@ public class PaymentProviderServiceTest {
 	@Test
 	public void reverseTransactionNegativeAmountTest() throws PaymentProviderException {
 		transDetails.setTransactionType(Constants.REVERSE);
-		transDetails.setAmount(150);
+		transDetails.setAmount(150.00);
 		Mockito.when(paymentProviderUtil.findByorder(any(CommandLinePojo.class))).thenReturn(transDetailsDbMock);
 		assertEquals(Constants.ERROR.concat(Constants.AMOUNTERROR),
 				paymentProviderService.reverseTransaction(transDetails));
@@ -415,7 +415,7 @@ public class PaymentProviderServiceTest {
 
 	public static CommandLinePojo ibeClientCommandLinePojoObject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
-		transDetails.setAmount(250);
+		transDetails.setAmount(250.00);
 		transDetails.setClientId("IBE");
 		transDetails.setCurrency("EUR");
 		transDetails.setOrderId("book-37847");
@@ -429,7 +429,7 @@ public class PaymentProviderServiceTest {
 
 	public static TransactionDetails ibeClientTransactionDetailsPojoObject() {
 		TransactionDetails transDetails = new TransactionDetails();
-		transDetails.setAmount(250);
+		transDetails.setAmount(250.00);
 		transDetails.setClientId("IBE");
 		transDetails.setCurrency("EUR");
 		transDetails.setPayMethod("CARD");

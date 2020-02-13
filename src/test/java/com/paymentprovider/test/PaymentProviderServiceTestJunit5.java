@@ -7,16 +7,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +40,7 @@ public class PaymentProviderServiceTestJunit5 {
 	TransactionDetailsRepository transDetalRepo;
 
 	
-//	public static void main(String[] args) {
-//
-//		 JUnitCore.runClasses(PaymentProviderServiceTestJunit5.class);
-//	}
+
 
 	@Test
 //	@Order
@@ -561,7 +554,7 @@ public class PaymentProviderServiceTestJunit5 {
 		try {
 			Double amount = transDetalRepo.findTotalAmont("IBM", java.time.LocalDate.now(), java.time.LocalDate.now());
 
-			assertTrue(amount.equals(150));
+			assertTrue(amount.equals(150.0));
 
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -576,7 +569,7 @@ public class PaymentProviderServiceTestJunit5 {
 	public static CommandLinePojo zIbeRegisterobject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
 
-		transDetails.setAmount(250);
+		transDetails.setAmount(250.00);
 		transDetails.setClientId("IBE");
 		transDetails.setCurrency("EUR");
 		transDetails.setOrderId("book-37847");
@@ -591,7 +584,7 @@ public class PaymentProviderServiceTestJunit5 {
 	public static CommandLinePojo zIbmRegisterobject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
 
-		transDetails.setAmount(150);
+		transDetails.setAmount(150.00);
 		transDetails.setClientId("IBM");
 		transDetails.setCurrency("USD");
 		transDetails.setOrderId("book-37747");
@@ -606,7 +599,7 @@ public class PaymentProviderServiceTestJunit5 {
 	public static CommandLinePojo zMdmRegisterobject() {
 		CommandLinePojo transDetails = new CommandLinePojo();
 
-		transDetails.setAmount(50);
+		transDetails.setAmount(50.00);
 		transDetails.setClientId("MDM");
 		transDetails.setCurrency("GBP");
 		transDetails.setOrderId("book-37689");

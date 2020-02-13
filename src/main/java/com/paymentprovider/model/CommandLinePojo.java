@@ -7,7 +7,7 @@ public class CommandLinePojo {
 
 	private String clientId;
 	private String orderId;
-	private Integer amount;
+	private Double amount;
 	private String transactionType;
 	private String currency;
 	private String payMethod;
@@ -31,11 +31,11 @@ public class CommandLinePojo {
 		this.orderId = orderId;
 	}
 
-	public Integer getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Integer amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 

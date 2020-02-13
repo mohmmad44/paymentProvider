@@ -28,7 +28,7 @@ public class TransactionDetails {
 	private LocalDate date;
 
 	@Column(name = "amount")
-	private Integer amount;
+	private Double amount;
 
 	@Column(name = "currency")
 	private String currency;
@@ -69,11 +69,11 @@ public class TransactionDetails {
 		this.date = date;
 	}
 
-	public Integer getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Integer amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
